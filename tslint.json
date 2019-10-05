@@ -1,0 +1,12 @@
+{
+  "extends": "gts/tslint.json",
+  "rules": {
+    "no-default-export": false
+  },
+  "linterOptions": {
+    "exclude": [
+      "**/*.json",
+      "prettier.config.js"
+    ]
+  }
+}

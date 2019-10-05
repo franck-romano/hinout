@@ -1,0 +1,45 @@
+{
+  "name": "http-log-tracer",
+  "version": "1.0.0",
+  "description": "Log incoming and outgoind http request on your server",
+  "main": "index.ts",
+  "author": "franck.romano@protonmail.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/franck-romano/http-log-tracer.git"
+  },
+  "license": "MIT",
+  "scripts": {
+    "lint": "gts check",
+    "lint:fix": "gts lint -fix",
+    "compile": "tsc -p ."
+  },
+  "pre-commit": [
+    "lint"
+  ],
+  "dependencies": {
+    "@types/mocha": "5.2.7",
+    "@types/node": "12.0.10",
+    "@types/sinon": "7.0.13",
+    "@types/sinon-chai": "3.2.2",
+    "@types/supertest": "2.0.8",
+    "typescript": "3.6.3"
+  },
+  "devDependencies": {
+    "chai": "4.2.0",
+    "chai-as-promised": "7.1.1",
+    "chai-sorted": "0.2.0",
+    "dirty-chai": "2.0.1",
+    "dotenv": "8.1.0",
+    "gts": "1.1.0",
+    "mocha": "6.1.4",
+    "nock": "10.0.6",
+    "prettier": "1.18.2",
+    "sinon": "7.3.2",
+    "sinon-chai": "3.3.0",
+    "superagent-defaults": "0.1.14",
+    "supertest": "4.0.2",
+    "ts-node": "8.3.0",
+    "pre-commit": "1.2.2"
+  }
+}
