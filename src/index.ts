@@ -1,5 +1,4 @@
-export default class OutboundTracer {
-  constructor() {
-    throw new Error('not yet implemented');
-  }
-}
+import logger from './infrastructure/logger';
+import OutboundTracer from './outbound-tracer';
+
+export default new OutboundTracer(logger);
