@@ -1,18 +1,8 @@
 import http from 'http';
 import nock from 'nock';
-import sinon from 'sinon';
-import chai, { expect as chaiExpect } from 'chai';
 import { EventEmitter } from 'events';
+import { sinon, expect } from '../tests/config';
 import OutboundTracer from '../src/outbound-tracer';
-const expect: any = chaiExpect;
-import sinonChai from 'sinon-chai';
-import dirtyChai from 'dirty-chai';
-import chaiAsPromised from 'chai-as-promised';
-
-chai.should();
-chai.use(sinonChai);
-chai.use(chaiAsPromised);
-chai.use(dirtyChai);
 
 describe('Http Log Tracer', () => {
   const outboundUrl = 'http://some-url.com';
