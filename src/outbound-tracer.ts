@@ -12,16 +12,18 @@ export default class OutboundTracer extends EventEmitter {
   }
 
   private collect() {
-    const boundedGet = this.addEmitter.bind(this, http.get);
-    const boundedRequest = this.addEmitter.bind(this, http.request);
-    http.get = boundedGet;
-    http.request = boundedRequest;
+    const functions = [{ fnName: 'get', fn: http.get }, { fnName: 'request', fn: http.request }];
+    functions.forEach(({ fnName, fn }) => {
+      http[fnName] = this.addEmitter.bind(this, fn);
+    });
   }
 
   private addEmitter(fn: Function, ...args) {
     const overridedHttp = fn(...args);
+    const { method, path } = overridedHttp;
+    const host = overridedHttp.getHeader('host');
     overridedHttp.prependOnceListener('finish', () => {
-      this.emit('outbound', {});
+      this.emit('outbound', { host, method, path });
     });
     return overridedHttp;
   }

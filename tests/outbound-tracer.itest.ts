@@ -14,6 +14,10 @@ describe('Outbound Tracer', () => {
   });
 
   describe('.(logFn)', () => {
+    const host = 'localhost';
+    const port = 8081;
+    const path = '/foo';
+    const expectedHost = `${host}:${port}`;
     context('http', () => {
       context('http.get()', () => {
         it('logs the emitted event using the provided { logFn }', async () => {
@@ -25,7 +29,7 @@ describe('Outbound Tracer', () => {
           http
             .get('http://localhost:8081/foo', res => {
               res.on('data', () => {});
-              expect(logFn).to.have.been.calledWith({});
+              expect(logFn).to.have.been.calledWith({ host: expectedHost, method: 'GET', path: '/foo' });
             })
             .on('error', () => {});
         });
@@ -40,10 +44,10 @@ describe('Outbound Tracer', () => {
             // WHEN
             outboundTracer.observe();
             const req = http
-              .request({ host: 'localhost', port: 8081, path: '/foo', method }, res => {
+              .request({ host, port, path, method }, res => {
                 res.on('data', () => {});
                 res.on('end', () => {
-                  expect(logFn).to.have.been.calledWith({});
+                  expect(logFn).to.have.been.calledWith({ host: expectedHost, method, path });
                 });
               })
               .on('error', () => {});
@@ -57,7 +61,3 @@ describe('Outbound Tracer', () => {
     });
   });
 });
-
-function req(options) {
-  return new Promise((resolve, reject) => {});
-}
