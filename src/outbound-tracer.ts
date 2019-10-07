@@ -14,13 +14,13 @@ export default class OutboundTracer extends EventEmitter {
   }
 
   listen() {
-    this.on('outbound-ended', this.logFn);
+    this.on('outbound', this.logFn);
   }
 
   private addEmitter(fn: Function, ...args) {
     const overridedHttp = fn(...args);
     overridedHttp.prependOnceListener('finish', () => {
-      this.emit('outbound-ended', {});
+      this.emit('outbound', {});
     });
     return overridedHttp;
   }

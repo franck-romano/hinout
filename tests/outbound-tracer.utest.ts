@@ -55,7 +55,7 @@ describe.only('Http Log Tracer', () => {
         // THEN
         const args = onSpy.getCall(1).args;
         expect(args.length).to.equal(2);
-        expect(args[0]).to.equal('outbound-ended');
+        expect(args[0]).to.equal('outbound');
         expect(args[1]).to.equal(logFnSpy);
       });
     });
