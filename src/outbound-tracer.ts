@@ -1,11 +1,9 @@
 import http from 'http';
 import { EventEmitter } from 'events';
 
-export default class OutboundTracer {
-  private outboundEmitter;
-  constructor(private logFn: Function = console.log) {
-    this.logFn = logFn;
-    this.outboundEmitter = new EventEmitter();
+export default class OutboundTracer extends EventEmitter {
+  constructor(private logFn = console.log) {
+    super();
   }
 
   collect() {
@@ -16,13 +14,13 @@ export default class OutboundTracer {
   }
 
   listen() {
-    this.outboundEmitter.on('outbound-ended', this.logFn);
+    this.on('outbound-ended', this.logFn);
   }
 
   private addEmitter(fn: Function, ...args) {
     const overridedHttp = fn(...args);
     overridedHttp.prependOnceListener('finish', () => {
-      this.outboundEmitter.emit('outbound-ended', {});
+      this.emit('outbound-ended', {});
     });
     return overridedHttp;
   }

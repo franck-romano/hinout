@@ -4,7 +4,7 @@ import { EventEmitter } from 'events';
 import { sinon, expect } from '../tests/config';
 import OutboundTracer from '../src/outbound-tracer';
 
-describe('Http Log Tracer', () => {
+describe.only('Http Log Tracer', () => {
   const outboundUrl = 'http://some-url.com';
   let prependOnceListenerSpy, emitSpy, onSpy, outboundNock;
 
