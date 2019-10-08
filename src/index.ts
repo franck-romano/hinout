@@ -1,3 +1,3 @@
-import OutboundTracer from './outbound-tracer';
+import Hinout from './hinout';
 
-export default OutboundTracer;
+export default Hinout;

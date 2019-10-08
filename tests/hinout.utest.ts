@@ -1,15 +1,15 @@
 import http from 'http';
 import nock from 'nock';
 import { EventEmitter } from 'events';
-import { sinon, expect } from '../tests/config';
-import OutboundTracer from '../src/outbound-tracer';
+import { sinon, expect } from './config';
+import Hinout from '../src/hinout';
 
-describe('Outbound Tracer', () => {
-  const outboundUrl = 'http://some-url.com';
-  let prependOnceListenerSpy, emitSpy, outboundNock;
+describe('Hinout', () => {
+  const url = 'http://some-url.com';
+  let prependOnceListenerSpy, emitSpy, hinoutNock;
 
   beforeEach(() => {
-    outboundNock = nock(outboundUrl);
+    hinoutNock = nock(url);
     emitSpy = sinon.spy(EventEmitter.prototype, 'emit');
     prependOnceListenerSpy = sinon.spy(EventEmitter.prototype, 'prependOnceListener');
   });
@@ -19,24 +19,24 @@ describe('Outbound Tracer', () => {
     prependOnceListenerSpy.restore();
   });
 
-  describe('.(logFn)', () => {
-    beforeEach(() => outboundNock.get('/').reply(200));
+  describe('.({ logFn })', () => {
+    beforeEach(() => hinoutNock.get('/').reply(200));
     describe('.collect()', () => {
-      let outboundTracer;
-      beforeEach(() => (outboundTracer = new OutboundTracer()));
-      afterEach(() => outboundTracer.removeAllListeners());
+      let hinout;
+      beforeEach(() => (hinout = new Hinout()));
+      afterEach(() => hinout.removeAllListeners());
       it('attaches an emitter on http.get function call', () => {
         // WHEN
-        outboundTracer.collect();
-        http.get(outboundUrl);
+        hinout.collect();
+        http.get(url);
         // THEN
         expect(prependOnceListenerSpy).to.have.been.calledWith('finish', sinon.match.func);
       });
 
       it('attaches an emitter on http.request function call', () => {
         // WHEN
-        outboundTracer.collect();
-        http.request(outboundUrl);
+        hinout.collect();
+        http.request(url);
         // THEN
         expect(prependOnceListenerSpy).to.have.been.calledWith('finish', sinon.match.func);
       });
@@ -47,14 +47,14 @@ describe('Outbound Tracer', () => {
         // GIVEN
         const event = { some: 'event' };
         const onCallbackSpy = sinon.spy();
-        const onSpy = sinon.spy(OutboundTracer.prototype, 'on');
-        const outboundTracer = new OutboundTracer();
+        const onSpy = sinon.spy(Hinout.prototype, 'on');
+        const hinout = new Hinout();
         // WHEN
-        outboundTracer.on('outbound', onCallbackSpy);
-        outboundTracer.emit('outbound', event);
-        outboundTracer.observe();
+        hinout.on('out', onCallbackSpy);
+        hinout.emit('out', event);
+        hinout.observe();
         // THEN
-        expect(OutboundTracer.prototype.on).to.have.been.called();
+        expect(Hinout.prototype.on).to.have.been.called();
         expect(onCallbackSpy).to.have.been.calledWith(event);
         onSpy.restore();
       });

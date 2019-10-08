@@ -1,2 +1,2 @@
-# outbound-tracer
-Trace any outbounding http request from your Node.js application
+# Hinout
+Trace any inbounding an outbounding http request from your Node.js application

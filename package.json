@@ -16,7 +16,8 @@
     "test": "mocha -r ts-node/register tests/*.ts"
   },
   "pre-commit": [
-    "lint"
+    "lint",
+    "test"
   ],
   "dependencies": {
     "@types/chai": "4.1.7",
