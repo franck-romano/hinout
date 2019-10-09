@@ -7,33 +7,44 @@ interface HinoutOptions {
 
 export default class Hinout extends EventEmitter {
   private logFn;
+  private eventTypes;
   constructor(options?: HinoutOptions) {
     super();
+    this.eventTypes = {
+      OUT: 'out',
+      IN: 'in'
+    };
     this.logFn = (options && options.logFn) || console.log;
-    this.on('out', this.logFn);
-    this.on('in', this.logFn);
+    this.on(this.eventTypes.OUT, this.logFn);
+    this.on(this.eventTypes.IN, this.logFn);
   }
 
-  collect() {
+  collect(): Hinout {
     const functions = [{ fnName: 'get', fn: http.get }, { fnName: 'request', fn: http.request }];
     functions.forEach(({ fnName, fn }) => {
-      http[fnName] = this.emitEventOnOutboundAndInbound.bind(this, fn);
+      http[fnName] = this.attachListenersToFn.bind(this, fn);
     });
+    return this;
   }
 
-  private emitEventOnOutboundAndInbound(fn: Function, ...args) {
-    const overridedHttp = fn(...args);
-    const { method, path } = overridedHttp;
-    const host = overridedHttp.getHeader('host');
-    overridedHttp.prependOnceListener('finish', () => {
-      this.emit('out', { host, method, path });
-    });
+  private attachListenersToFn(fn: Function, ...args) {
+    const request = fn(...args);
+    this.emitOnOutbound(request);
+    this.emitOnInbound(request);
 
-    overridedHttp.prependOnceListener('response', response => {
+    return request;
+  }
+
+  private emitOnOutbound(request): void {
+    const { method, path } = request;
+    const host = request.getHeader('host');
+    request.prependOnceListener('finish', () => this.emit(this.eventTypes.OUT, { host, method, path }));
+  }
+
+  private emitOnInbound(request): void {
+    request.prependOnceListener('response', response => {
       const { statusCode, statusMessage, httpVersion } = response;
-      this.emit('in', { httpVersion, statusCode, statusMessage });
+      this.emit(this.eventTypes.IN, { httpVersion, statusCode, statusMessage });
     });
-
-    return overridedHttp;
   }
 }
