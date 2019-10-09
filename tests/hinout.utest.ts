@@ -40,9 +40,7 @@ describe('Hinout', () => {
         // THEN
         expect(prependOnceListenerSpy).to.have.been.calledWith('finish', sinon.match.func);
       });
-    });
 
-    describe('.observe()', () => {
       it('reacts to emitted events', () => {
         // GIVEN
         const event = { some: 'event' };
@@ -50,14 +48,17 @@ describe('Hinout', () => {
         const onSpy = sinon.spy(Hinout.prototype, 'on');
         const hinout = new Hinout();
         // WHEN
+        hinout.collect();
         hinout.on('out', onCallbackSpy);
         hinout.emit('out', event);
-        hinout.observe();
+        hinout.on('in', onCallbackSpy);
+        hinout.emit('int', event);
         // THEN
         expect(Hinout.prototype.on).to.have.been.called();
         expect(onCallbackSpy).to.have.been.calledWith(event);
         onSpy.restore();
       });
     });
+
   });
 });

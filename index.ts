@@ -1,3 +1,3 @@
 import Hinout from './src/hinout';
 
-export default Hinout;
+export default new Hinout();

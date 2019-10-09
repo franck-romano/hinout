@@ -10,15 +10,11 @@ export default class Hinout extends EventEmitter {
   constructor(options?: HinoutOptions) {
     super();
     this.logFn = (options && options.logFn) || console.log;
-    this.collect();
-  }
-
-  observe() {
     this.on('out', this.logFn);
     this.on('in', this.logFn);
   }
 
-  private collect() {
+  collect() {
     const functions = [{ fnName: 'get', fn: http.get }, { fnName: 'request', fn: http.request }];
     functions.forEach(({ fnName, fn }) => {
       http[fnName] = this.emitEventOnOutboundAndInbound.bind(this, fn);
