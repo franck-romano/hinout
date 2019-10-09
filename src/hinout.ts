@@ -1,5 +1,6 @@
 import http from 'http';
 import { EventEmitter } from 'events';
+import eventTypes from './event-types';
 
 interface HinoutOptions {
   logFn?: Function;
@@ -7,16 +8,11 @@ interface HinoutOptions {
 
 export default class Hinout extends EventEmitter {
   private logFn;
-  private eventTypes;
   constructor(options?: HinoutOptions) {
     super();
-    this.eventTypes = {
-      OUT: 'out',
-      IN: 'in'
-    };
     this.logFn = (options && options.logFn) || console.log;
-    this.on(this.eventTypes.OUT, this.logFn);
-    this.on(this.eventTypes.IN, this.logFn);
+    this.on(eventTypes.OUT, this.logFn);
+    this.on(eventTypes.IN, this.logFn);
   }
 
   collect(): Hinout {
@@ -38,13 +34,15 @@ export default class Hinout extends EventEmitter {
   private emitOnOutbound(request): void {
     const { method, path } = request;
     const host = request.getHeader('host');
-    request.prependOnceListener('finish', () => this.emit(this.eventTypes.OUT, { host, method, path }));
+    request.prependOnceListener('finish', () =>
+      this.emit(eventTypes.OUT, { host, method, path, eventType: eventTypes.OUT })
+    );
   }
 
   private emitOnInbound(request): void {
     request.prependOnceListener('response', response => {
       const { statusCode, statusMessage, httpVersion } = response;
-      this.emit(this.eventTypes.IN, { httpVersion, statusCode, statusMessage });
+      this.emit(eventTypes.IN, { httpVersion, statusCode, statusMessage, eventType: eventTypes.IN });
     });
   }
 }

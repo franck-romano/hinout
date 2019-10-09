@@ -2,6 +2,7 @@ import http from 'http';
 import server from './server';
 import Hinout from '../src/hinout';
 import { sinon, expect } from './config';
+import eventTypes from '../src/event-types';
 
 describe('Hinout', () => {
   let fakeServer;
@@ -14,6 +15,7 @@ describe('Hinout', () => {
     const path = '/foo';
     const errorPath = '/bar'
     const expectedHost = `${host}:${port}`;
+    const { IN, OUT } = eventTypes
     // GIVEN
     const logFn = sinon.spy();
     new Hinout({ logFn }).collect()
@@ -27,11 +29,12 @@ describe('Hinout', () => {
             await httpGetPromisified(host, port, path);
             // THEN
             expect(logFn).to.have.been.calledTwice()
-            expect(logFn.getCall(0)).to.have.been.calledWith({ host: expectedHost, method: 'GET', path });
+            expect(logFn.getCall(0)).to.have.been.calledWith({ host: expectedHost, method: 'GET', path, eventType: OUT });
             expect(logFn.getCall(1)).to.have.been.calledWith({
               httpVersion: '1.1',
               statusCode: 200,
-              statusMessage: 'OK'
+              statusMessage: 'OK',
+              eventType: IN
             });
           });
         })
@@ -49,11 +52,12 @@ describe('Hinout', () => {
                 await httpRequestPromisified(host, port, path, method)
                 // THEN
                 expect(logFn).to.have.been.calledTwice()
-                expect(logFn.getCall(0)).to.have.been.calledWith({ host: expectedHost, method, path });
+                expect(logFn.getCall(0)).to.have.been.calledWith({ host: expectedHost, method, path, eventType: OUT });
                 expect(logFn.getCall(1)).to.have.been.calledWith({
                   httpVersion: '1.1',
                   statusCode,
-                  statusMessage
+                  statusMessage,
+                  eventType: IN
                 });
               });
             });
@@ -68,11 +72,14 @@ describe('Hinout', () => {
             await httpGetPromisified(host, port, errorPath);
             // THEN
             expect(logFn).to.have.been.calledTwice()
-            expect(logFn.getCall(0)).to.have.been.calledWith({ host: expectedHost, method: 'GET', path: errorPath });
+            expect(logFn.getCall(0)).to.have.been.calledWith({
+              host: expectedHost, method: 'GET', path: errorPath, eventType: OUT
+            });
             expect(logFn.getCall(1)).to.have.been.calledWith({
               httpVersion: '1.1',
               statusCode: 400,
-              statusMessage: 'Bad Request'
+              statusMessage: 'Bad Request',
+              eventType: IN
             })
           });
         });
@@ -91,11 +98,12 @@ describe('Hinout', () => {
                   await httpRequestPromisified(host, port, errorPath, method)
                   // THEN
                   expect(logFn).to.have.been.calledTwice()
-                  expect(logFn.getCall(0)).to.have.been.calledWith({ host: expectedHost, method, path: errorPath });
+                  expect(logFn.getCall(0)).to.have.been.calledWith({ host: expectedHost, method, path: errorPath, eventType: OUT });
                   expect(logFn.getCall(1)).to.have.been.calledWith({
                     httpVersion: '1.1',
                     statusCode,
-                    statusMessage
+                    statusMessage,
+                    eventType: IN
                   });
                 })
               });
