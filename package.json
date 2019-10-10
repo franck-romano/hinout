@@ -13,7 +13,8 @@
     "lint": "gts check",
     "lint:fix": "gts lint -fix",
     "compile": "tsc -p .",
-    "test": "mocha -r ts-node/register tests/*.ts"
+    "test": "mocha -r ts-node/register tests/*.ts",
+    "test:watch": "mocha -r ts-node/register tests/*.ts --watch --watch-extensions ts"
   },
   "pre-commit": [
     "lint",
