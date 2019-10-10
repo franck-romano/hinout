@@ -23,7 +23,7 @@ describe('Hinout', () => {
     beforeEach(() => hinoutNock.get('/').reply(200));
     describe('.collect()', () => {
       let hinout;
-      beforeEach(() => (hinout = new Hinout()));
+      beforeEach(() => (hinout = new Hinout({ logFn: sinon.spy(), format: sinon.spy() })));
       afterEach(() => hinout.removeAllListeners());
       it('attaches an emitter on http.get function call', () => {
         // WHEN
@@ -46,7 +46,7 @@ describe('Hinout', () => {
         const event = { some: 'event' };
         const onCallbackSpy = sinon.spy();
         const onSpy = sinon.spy(Hinout.prototype, 'on');
-        const hinout = new Hinout();
+        const hinout = new Hinout({ logFn: sinon.spy(), format: sinon.spy() });
         // WHEN
         hinout.collect();
         hinout.on('out', onCallbackSpy);

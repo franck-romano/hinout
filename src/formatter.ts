@@ -14,7 +14,7 @@ interface InEvent {
   eventType: string;
 }
 
-export default (event: OutEvent | InEvent) => {
+export default function(event: OutEvent | InEvent) {
   if (event.eventType === eventTypes.OUT) {
     const { host, method, path, eventType } = event as OutEvent;
     return `${eventType.toUpperCase()} - ${method} ${host}${path}`;
@@ -23,4 +23,4 @@ export default (event: OutEvent | InEvent) => {
     const { httpVersion, statusCode, statusMessage, eventType } = event as InEvent;
     return `${eventType.toUpperCase()} - HTTP ${httpVersion} ${statusCode} ${statusMessage}`;
   }
-};
+}

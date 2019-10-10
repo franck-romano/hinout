@@ -3,8 +3,9 @@ import server from './server';
 import Hinout from '../src/hinout';
 import { sinon, expect } from './config';
 import eventTypes from '../src/event-types';
+import format from '../src/formatter'
 
-describe('Hinout', () => {
+describe.only('Hinout', () => {
   let fakeServer;
   before(() => (fakeServer = server.listen(8081)));
   after(() => fakeServer.close());
@@ -18,24 +19,19 @@ describe('Hinout', () => {
     const { IN, OUT } = eventTypes
     // GIVEN
     const logFn = sinon.spy();
-    new Hinout({ logFn }).collect()
+    new Hinout({ logFn, format }).collect()
     afterEach(() => logFn.resetHistory())
 
     context('http', () => {
       context('sucess', () => {
         context('.get(url)', () => {
-          it('logs inbound an outbound request', async () => {
+          it.only('logs inbound an outbound request', async () => {
             // WHEN
             await httpGetPromisified(host, port, path);
             // THEN
             expect(logFn).to.have.been.calledTwice()
-            expect(logFn.getCall(0)).to.have.been.calledWith({ host: expectedHost, method: 'GET', path, eventType: OUT });
-            expect(logFn.getCall(1)).to.have.been.calledWith({
-              httpVersion: '1.1',
-              statusCode: 200,
-              statusMessage: 'OK',
-              eventType: IN
-            });
+            expect(logFn.getCall(0)).to.have.been.calledWith('OUT - GET localhost:8081/foo');
+            expect(logFn.getCall(1)).to.have.been.calledWith('IN - HTTP 1.1 200 OK');
           });
         })
 

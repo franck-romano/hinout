@@ -4,21 +4,25 @@ import eventTypes from './event-types';
 
 interface HinoutOptions {
   logFn?: Function;
+  format: Function;
 }
 
 export default class Hinout extends EventEmitter {
   private logFn;
-  constructor(options?: HinoutOptions) {
+  private format;
+  constructor(options: HinoutOptions) {
     super();
     this.logFn = (options && options.logFn) || console.log;
-    this.on(eventTypes.OUT, this.logFn);
-    this.on(eventTypes.IN, this.logFn);
+    this.format = options.format;
+    this.on(eventTypes.OUT, event => this.logFn(this.format(event)));
+    this.on(eventTypes.IN, event => this.logFn(this.format(event)));
   }
 
   collect(): Hinout {
     const functions = [{ fnName: 'get', fn: http.get }, { fnName: 'request', fn: http.request }];
     functions.forEach(({ fnName, fn }) => {
-      http[fnName] = this.attachListenersToFn.bind(this, fn);
+      const fnWithListeners = this.attachListenersToFn.bind(this, fn);
+      http[fnName] = fnWithListeners;
     });
     return this;
   }
