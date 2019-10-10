@@ -1,13 +1,13 @@
 {
   "name": "hinout",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Log incoming and outgoind http request on your server",
   "main": "build/index.ts",
   "types": "build/index.d.ts",
   "author": "franck.romano@protonmail.com",
   "repository": {
     "type": "git",
-    "url": "https://github.com/franck-romano/outbound-tracer.git"
+    "url": "https://github.com/franck-romano/hinout.git"
   },
   "license": "MIT",
   "scripts": {
