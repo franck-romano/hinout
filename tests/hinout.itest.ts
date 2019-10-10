@@ -116,22 +116,28 @@ describe('Hinout', () => {
 
 function httpGetPromisified(host: string, port: number, path: string) {
   return new Promise((resolve, reject) => {
+    const data: any = []
     http
       .get(`http://${host}:${port}${path}`, result => {
-        result.on('data', () => { });
-        result.on('end', resolve);
+        result.on('data', (chunk) => {
+          data.push(chunk.toString())
+        });
+        result.on('end', () => resolve(...data));
         result.on('error', reject);
-      })
-      .end();
+      }).end()
+
   });
 }
 
 function httpRequestPromisified(host: string, port: number, path: string, method: string) {
   return new Promise((resolve, reject) => {
+    const data: any = []
     http
       .request({ host, port, path, method }, result => {
-        result.on('data', () => { });
-        result.on('end', resolve);
+        result.on('data', (chunk) => {
+          data.push(chunk.toString())
+        });
+        result.on('end', () => resolve(...data));
         result.on('error', reject);
       })
       .end();
