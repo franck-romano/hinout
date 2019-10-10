@@ -11,7 +11,7 @@
   "license": "MIT",
   "scripts": {
     "lint": "gts check",
-    "lint:fix": "gts lint -fix",
+    "lint:fix": "gts fix",
     "compile": "tsc -p .",
     "test": "mocha -r ts-node/register tests/*.ts",
     "test:watch": "mocha -r ts-node/register tests/*.ts --watch --watch-extensions ts"
@@ -31,10 +31,7 @@
   },
   "devDependencies": {
     "chai": "4.2.0",
-    "chai-as-promised": "7.1.1",
-    "chai-sorted": "0.2.0",
     "dirty-chai": "2.0.1",
-    "dotenv": "8.1.0",
     "express": "4.17.1",
     "gts": "1.1.0",
     "mocha": "6.1.4",
@@ -43,8 +40,6 @@
     "prettier": "1.18.2",
     "sinon": "7.3.2",
     "sinon-chai": "3.3.0",
-    "superagent-defaults": "0.1.14",
-    "supertest": "4.0.2",
     "ts-node": "8.3.0"
   }
 }

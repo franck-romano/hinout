@@ -1,8 +1,8 @@
 import http from 'http';
 import nock from 'nock';
+import Hinout from '../src/hinout';
 import { EventEmitter } from 'events';
 import { sinon, expect } from './config';
-import Hinout from '../src/hinout';
 
 describe('Hinout', () => {
   const url = 'http://some-url.com';
@@ -25,40 +25,48 @@ describe('Hinout', () => {
       let hinout;
       beforeEach(() => (hinout = new Hinout({ logFn: sinon.spy(), format: sinon.spy() })));
       afterEach(() => hinout.removeAllListeners());
-      it('attaches an emitter on http.get function call', () => {
-        // WHEN
-        hinout.collect();
-        http.get(url);
-        // THEN
-        expect(prependOnceListenerSpy).to.have.been.calledWith('finish', sinon.match.func);
-      });
+      context('attaching listeners', () => {
+        it('attaches listeners to http.get function', () => {
+          // WHEN
+          hinout.collect();
+          http.get(url);
+          // THEN
+          expect(prependOnceListenerSpy).to.have.been.calledWith('finish', sinon.match.func);
+          expect(prependOnceListenerSpy).to.have.been.calledWith('response', sinon.match.func);
 
-      it('attaches an emitter on http.request function call', () => {
-        // WHEN
-        hinout.collect();
-        http.request(url);
-        // THEN
-        expect(prependOnceListenerSpy).to.have.been.calledWith('finish', sinon.match.func);
-      });
+        });
 
-      it('reacts to emitted events', () => {
-        // GIVEN
-        const event = { some: 'event' };
-        const onCallbackSpy = sinon.spy();
-        const onSpy = sinon.spy(Hinout.prototype, 'on');
-        const hinout = new Hinout({ logFn: sinon.spy(), format: sinon.spy() });
-        // WHEN
-        hinout.collect();
-        hinout.on('out', onCallbackSpy);
-        hinout.emit('out', event);
-        hinout.on('in', onCallbackSpy);
-        hinout.emit('int', event);
-        // THEN
-        expect(Hinout.prototype.on).to.have.been.called();
-        expect(onCallbackSpy).to.have.been.calledWith(event);
-        onSpy.restore();
-      });
+        it('attaches listeners to http.request function', () => {
+          // WHEN
+          hinout.collect();
+          http.request(url);
+          // THEN
+          expect(prependOnceListenerSpy).to.have.been.calledWith('finish', sinon.match.func);
+          expect(prependOnceListenerSpy).to.have.been.calledWith('response', sinon.match.func);
+        });
+      })
+
+      context('observing emitted events', () => {
+        it('logs the formatted event', () => {
+          // GIVEN
+          const event = { some: 'event' };
+          const logFnSpy = sinon.spy()
+          const formatStub = sinon.stub().returns('event')
+          const onSpy = sinon.spy(Hinout.prototype, 'on');
+          const onCallbackSpy = sinon.spy();
+          const hinout = new Hinout({ logFn: logFnSpy, format: formatStub });
+          // WHEN
+          hinout.collect();
+          hinout.on('out', onCallbackSpy);
+          hinout.emit('out', event);
+          // THEN
+          expect(onSpy).to.have.been.called();
+          expect(onCallbackSpy).to.have.been.calledWith(event);
+          expect(logFnSpy).to.have.been.calledWith('event')
+          onSpy.restore();
+        });
+      })
+
     });
-
   });
 });
