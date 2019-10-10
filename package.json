@@ -2,7 +2,8 @@
   "name": "http-log-tracer",
   "version": "1.0.0",
   "description": "Log incoming and outgoind http request on your server",
-  "main": "index.ts",
+  "main": "build/index.ts",
+  "types": "build/index.d.ts",
   "author": "franck.romano@protonmail.com",
   "repository": {
     "type": "git",
@@ -14,7 +15,8 @@
     "lint:fix": "gts fix",
     "compile": "tsc -p .",
     "test": "mocha -r ts-node/register tests/*.ts",
-    "test:watch": "mocha -r ts-node/register tests/*.ts --watch --watch-extensions ts"
+    "test:watch": "mocha -r ts-node/register tests/*.ts --watch --watch-extensions ts",
+    "prepublish": "yarn compile"
   },
   "pre-commit": [
     "lint",
