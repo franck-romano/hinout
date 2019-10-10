@@ -1,5 +1,5 @@
 {
-  "name": "http-log-tracer",
+  "name": "hinout",
   "version": "1.0.0",
   "description": "Log incoming and outgoind http request on your server",
   "main": "build/index.ts",
