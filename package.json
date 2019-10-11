@@ -1,6 +1,6 @@
 {
   "name": "hinout",
-  "version": "1.1.4",
+  "version": "1.1.5-beta",
   "description": "Log incoming and outgoind http request on your server",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -10,6 +10,9 @@
     "url": "https://github.com/franck-romano/hinout.git"
   },
   "license": "MIT",
+  "files": [
+    "build/**/*"
+  ],
   "scripts": {
     "lint": "gts check",
     "lint:fix": "gts fix",
