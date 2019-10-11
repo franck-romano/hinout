@@ -69,8 +69,8 @@ describe('Hinout', () => {
 
     });
 
-    describe(".setLoggingFunction(logFn)", () => {
-      it("replaces { logFn } with the new logging function", async () => {
+    describe('.setLoggingFunction(logFn)', () => {
+      it('replaces { logFn } with the new logging function', async () => {
         // GIVEN
         const newLoggerFn = sinon.stub()
         const defaultLogFn = sinon.stub()
