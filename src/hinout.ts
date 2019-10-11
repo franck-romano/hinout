@@ -11,28 +11,33 @@ interface HinoutOptions {
 export default class Hinout extends EventEmitter {
   private logFn;
   private formatFn;
+  private isCollecting;
   constructor(options: HinoutOptions) {
     super();
     this.logFn = options.logFn;
+    this.isCollecting = false;
     this.formatFn = options.formatFn;
     this.on(eventTypes.OUT, event => this.logFn(this.formatFn(event)));
     this.on(eventTypes.IN, event => this.logFn(this.formatFn(event)));
   }
 
   /**
-   *  Starts collecting and writing http requests logs to sdout
+   *  Starts collecting and writing HTTP(s) requests logs to sdout
    * @returns {Hinout} Instanciated Hinout object
    */
   collect(): Hinout {
-    [
-      { module: http, fnName: 'get', fn: http.get },
-      { module: http, fnName: 'request', fn: http.request },
-      { module: https, fnName: 'get', fn: https.get },
-      { module: https, fnName: 'request', fn: https.request }
-    ].forEach(({ module, fnName, fn }) => {
-      const fnWithListeners = this.attachListenersToFn.bind(this, fn);
-      module[fnName] = fnWithListeners;
-    });
+    if (!this.isCollecting) {
+      [
+        { module: http, fnName: 'get', fn: http.get },
+        { module: http, fnName: 'request', fn: http.request },
+        { module: https, fnName: 'get', fn: https.get },
+        { module: https, fnName: 'request', fn: https.request }
+      ].forEach(({ module, fnName, fn }) => {
+        const fnWithListeners = this.attachListenersToFn.bind(this, fn);
+        module[fnName] = fnWithListeners;
+      });
+    }
+    this.isCollecting = true;
 
     return this;
   }
