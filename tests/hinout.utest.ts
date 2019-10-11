@@ -1,15 +1,18 @@
 import http from 'http';
 import nock from 'nock';
+import https from 'https';
 import Hinout from '../src/hinout';
 import { EventEmitter } from 'events';
 import { sinon, expect } from './config';
 
 describe('Hinout', () => {
-  const url = 'http://some-url.com';
-  let prependOnceListenerSpy, emitSpy, hinoutNock;
+  const httpUrl = 'http://some-url.com';
+  const httpsUrl = 'https://some-url.com';
+  let prependOnceListenerSpy, emitSpy, hinoutHttpNock, hinoutHttpsNock, hinout;
 
   beforeEach(() => {
-    hinoutNock = nock(url);
+    hinoutHttpNock = nock(httpUrl);
+    hinoutHttpsNock = nock(httpsUrl);
     emitSpy = sinon.spy(EventEmitter.prototype, 'emit');
     prependOnceListenerSpy = sinon.spy(EventEmitter.prototype, 'prependOnceListener');
   });
@@ -19,70 +22,76 @@ describe('Hinout', () => {
     prependOnceListenerSpy.restore();
   });
 
-  describe('.({ logFn })', () => {
-    beforeEach(() => hinoutNock.get('/').reply(200));
-    describe('.collect()', () => {
-      let hinout;
-      beforeEach(() => (hinout = new Hinout({ logFn: sinon.spy(), format: sinon.spy() })));
-      afterEach(() => hinout.removeAllListeners());
-      context('attaching listeners', () => {
-        it('attaches listeners to http.get function', () => {
-          // WHEN
-          hinout.collect();
-          http.get(url);
-          // THEN
-          expect(prependOnceListenerSpy).to.have.been.calledWith('finish', sinon.match.func);
-          expect(prependOnceListenerSpy).to.have.been.calledWith('response', sinon.match.func);
-
-        });
-
-        it('attaches listeners to http.request function', () => {
-          // WHEN
-          hinout.collect();
-          http.request(url);
-          // THEN
-          expect(prependOnceListenerSpy).to.have.been.calledWith('finish', sinon.match.func);
-          expect(prependOnceListenerSpy).to.have.been.calledWith('response', sinon.match.func);
-        });
-      })
-
-      context('observing emitted events', () => {
-        it('logs the formatted event', () => {
-          // GIVEN
-          const event = { some: 'event' };
-          const logFnSpy = sinon.spy()
-          const formatStub = sinon.stub().returns('event')
-          const onSpy = sinon.spy(Hinout.prototype, 'on');
-          const onCallbackSpy = sinon.spy();
-          const hinout = new Hinout({ logFn: logFnSpy, format: formatStub });
-          // WHEN
-          hinout.collect();
-          hinout.on('out', onCallbackSpy);
-          hinout.emit('out', event);
-          // THEN
-          expect(onSpy).to.have.been.called();
-          expect(onCallbackSpy).to.have.been.calledWith(event);
-          expect(logFnSpy).to.have.been.calledWith('event')
-          onSpy.restore();
-        });
-      })
-
+  describe('.({ logFn, formatFn })', () => {
+    beforeEach(() => {
+      hinoutHttpNock.get('/').reply(200)
+      hinoutHttpsNock.get('/').reply(200)
     });
+    describe('.collect()', () => {
+      // GIVEN
+      beforeEach(() => (hinout = new Hinout({ logFn: sinon.spy(), formatFn: sinon.spy() })));
+      [
+        { moduleUnderTest: http, name: 'http', url: httpUrl },
+        { moduleUnderTest: https, name: 'https', url: httpsUrl },
+      ]
+        .forEach(({ moduleUnderTest, name, url }) => {
+          context(`${name} module`, () => {
+            it(`attaches listeners to ${name}.get()`, () => {
+              // WHEN
+              hinout.collect();
+              moduleUnderTest.get(url);
+              // THEN
+              expect(prependOnceListenerSpy).to.have.been.calledWith('finish', sinon.match.func);
+              expect(prependOnceListenerSpy).to.have.been.calledWith('response', sinon.match.func);
+            });
 
-    describe('.setLoggingFunction(logFn)', () => {
-      it('replaces { logFn } with the new logging function', async () => {
+            it(`attaches listeners to ${name}.get()`, () => {
+              // WHEN
+              hinout.collect();
+              moduleUnderTest.request(url);
+              // THEN
+              expect(prependOnceListenerSpy).to.have.been.calledWith('finish', sinon.match.func);
+              expect(prependOnceListenerSpy).to.have.been.calledWith('response', sinon.match.func);
+            })
+          })
+        })
+    })
+
+    context('observing emitted events', () => {
+      it('logs the formatted event', () => {
         // GIVEN
-        const newLoggerFn = sinon.stub()
-        const defaultLogFn = sinon.stub()
+        const event = { some: 'event' };
+        const logFnSpy = sinon.spy()
+        const formatStub = sinon.stub().returns('event')
+        const onSpy = sinon.spy(Hinout.prototype, 'on');
+        const onCallbackSpy = sinon.spy();
         // WHEN
-        new Hinout({ logFn: defaultLogFn, format: sinon.spy() })
-          .setLoggingFunction(newLoggerFn)
+        new Hinout({ logFn: logFnSpy, formatFn: formatStub })
           .collect()
-          .emit('out', 'some-event')
+          .on('out', onCallbackSpy)
+          .emit('out', event);;
         // THEN
-        expect(defaultLogFn).to.not.have.been.called()
-        expect(newLoggerFn).to.have.been.called()
-      })
+        expect(onSpy).to.have.been.called();
+        expect(onCallbackSpy).to.have.been.calledWith(event);
+        expect(logFnSpy).to.have.been.calledWith('event')
+        onSpy.restore();
+      });
+    })
+  });
+
+  describe('.setLoggingFunction(logFn)', () => {
+    it('replaces { logFn } with the new logging function', async () => {
+      // GIVEN
+      const newLoggerFn = sinon.stub()
+      const defaultLogFn = sinon.stub()
+      // WHEN
+      new Hinout({ logFn: defaultLogFn, formatFn: sinon.spy() })
+        .setLoggingFunction(newLoggerFn)
+        .collect()
+        .emit('out', 'some-event')
+      // THEN
+      expect(defaultLogFn).to.not.have.been.called()
+      expect(newLoggerFn).to.have.been.called()
     })
   });
 });

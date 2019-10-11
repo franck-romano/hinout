@@ -16,7 +16,7 @@ describe('Hinout', () => {
     const errorPath = '/bar'
     // GIVEN
     const logFn = sinon.spy();
-    new Hinout({ logFn, format }).collect()
+    new Hinout({ logFn, formatFn: format }).collect()
     afterEach(() => logFn.resetHistory())
     context('http', () => {
       context('sucess', () => {

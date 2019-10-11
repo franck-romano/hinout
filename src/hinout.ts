@@ -1,21 +1,22 @@
 import http from 'http';
+import https from 'https';
 import { EventEmitter } from 'events';
 import eventTypes from './event-types';
 
 interface HinoutOptions {
   logFn: Function;
-  format: Function;
+  formatFn: Function;
 }
 
 export default class Hinout extends EventEmitter {
   private logFn;
-  private format;
+  private formatFn;
   constructor(options: HinoutOptions) {
     super();
     this.logFn = options.logFn;
-    this.format = options.format;
-    this.on(eventTypes.OUT, event => this.logFn(this.format(event)));
-    this.on(eventTypes.IN, event => this.logFn(this.format(event)));
+    this.formatFn = options.formatFn;
+    this.on(eventTypes.OUT, event => this.logFn(this.formatFn(event)));
+    this.on(eventTypes.IN, event => this.logFn(this.formatFn(event)));
   }
 
   /**
@@ -23,11 +24,16 @@ export default class Hinout extends EventEmitter {
    * @returns {Hinout} Instanciated Hinout object
    */
   collect(): Hinout {
-    const functions = [{ fnName: 'get', fn: http.get }, { fnName: 'request', fn: http.request }];
-    functions.forEach(({ fnName, fn }) => {
+    [
+      { module: http, fnName: 'get', fn: http.get },
+      { module: http, fnName: 'request', fn: http.request },
+      { module: https, fnName: 'get', fn: https.get },
+      { module: https, fnName: 'request', fn: https.request }
+    ].forEach(({ module, fnName, fn }) => {
       const fnWithListeners = this.attachListenersToFn.bind(this, fn);
-      http[fnName] = fnWithListeners;
+      module[fnName] = fnWithListeners;
     });
+
     return this;
   }
 
