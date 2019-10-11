@@ -3,7 +3,7 @@ import { EventEmitter } from 'events';
 import eventTypes from './event-types';
 
 interface HinoutOptions {
-  logFn?: Function;
+  logFn: Function;
   format: Function;
 }
 
@@ -12,18 +12,32 @@ export default class Hinout extends EventEmitter {
   private format;
   constructor(options: HinoutOptions) {
     super();
-    this.logFn = (options && options.logFn) || console.log;
+    this.logFn = options.logFn;
     this.format = options.format;
     this.on(eventTypes.OUT, event => this.logFn(this.format(event)));
     this.on(eventTypes.IN, event => this.logFn(this.format(event)));
   }
 
+  /**
+   *  Starts collecting and writing http requests logs to sdout
+   * @returns {Hinout} Instanciated Hinout object
+   */
   collect(): Hinout {
     const functions = [{ fnName: 'get', fn: http.get }, { fnName: 'request', fn: http.request }];
     functions.forEach(({ fnName, fn }) => {
       const fnWithListeners = this.attachListenersToFn.bind(this, fn);
       http[fnName] = fnWithListeners;
     });
+    return this;
+  }
+
+  /**
+   * Overrides Hinout logging function
+   * @param {Function} logFn Logging function to use
+   * @returns {Hinout} Instanciated Hinout object
+   */
+  setLoggingFunction(logFn: Function): Hinout {
+    this.logFn = logFn;
     return this;
   }
 

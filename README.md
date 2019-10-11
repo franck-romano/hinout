@@ -33,6 +33,26 @@ Here's an example of an `outbound` and `inbound` formatted log:
 	OUT - GET http://localhost:8080/path
 	IN - HTTP 1.1 200 OK 
 
+
+### API
+**collect()** 
+
+Listen and log every http requests using `console.log` as default logging function
+
+Returns an intance of `Hinout`
+
+**setLoggingFunction(loggingFunction)**
+
+
+Override default logging function (`console.log`)
+
+```js
+Hinout.setLoggingFunction(yourLoggger.info)
+
+// yourLogger.info will now be used as logging function
+```
+Returns an intance of `Hinout`
+
 ### What is missing ?
 This project is in its early stage, so feel free to contribute ! :)
 
@@ -41,4 +61,4 @@ This project is in its early stage, so feel free to contribute ! :)
 - [ ] Writing events to a file
 - [ ] Logging payload and response of an HTTP request
 - [ ] Support for Node.js version < 8.X.X
-- [ ] Integration with existing logging libraries (for example [pino](https://github.com/pinojs/pino) or [winston](https://github.com/winstonjs/winston))
+- [X] Integration with existing logging libraries (for example [pino](https://github.com/pinojs/pino) or [winston](https://github.com/winstonjs/winston))

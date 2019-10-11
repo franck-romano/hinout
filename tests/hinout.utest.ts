@@ -68,5 +68,21 @@ describe('Hinout', () => {
       })
 
     });
+
+    describe(".setLoggingFunction(logFn)", () => {
+      it("replaces { logFn } with the new logging function", async () => {
+        // GIVEN
+        const newLoggerFn = sinon.stub()
+        const defaultLogFn = sinon.stub()
+        // WHEN
+        new Hinout({ logFn: defaultLogFn, format: sinon.spy() })
+          .setLoggingFunction(newLoggerFn)
+          .collect()
+          .emit('out', 'some-event')
+        // THEN
+        expect(defaultLogFn).to.not.have.been.called()
+        expect(newLoggerFn).to.have.been.called()
+      })
+    })
   });
 });

@@ -18,7 +18,6 @@ describe('Hinout', () => {
     const logFn = sinon.spy();
     new Hinout({ logFn, format }).collect()
     afterEach(() => logFn.resetHistory())
-
     context('http', () => {
       context('sucess', () => {
         context('.get(url)', () => {
