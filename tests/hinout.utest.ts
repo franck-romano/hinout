@@ -36,25 +36,29 @@ describe('Hinout', () => {
       ]
         .forEach(({ moduleUnderTest, name, url }) => {
           context(`${name} module`, () => {
-            it(`attaches listeners only once for each event ("finish", "response") to ${name}.get()`, () => {
-              // GIVEN
-              hinout.collect().collect();
-              // WHEN
-              moduleUnderTest.get(url);
-              // THEN
-              expect(prependOnceListenerSpy).to.have.been.calledTwice()
-              expect(prependOnceListenerSpy.getCall(0)).to.have.been.calledWith('finish', sinon.match.func);
-              expect(prependOnceListenerSpy.getCall(1)).to.have.been.calledWith('response', sinon.match.func);
-            });
+            context('.get()', () => {
+              it(`attaches listeners only once for each event ("finish", "response")`, () => {
+                // GIVEN
+                hinout.collect().collect();
+                // WHEN
+                moduleUnderTest.get(url);
+                // THEN
+                expect(prependOnceListenerSpy).to.have.been.calledTwice()
+                expect(prependOnceListenerSpy.getCall(0)).to.have.been.calledWith('finish', sinon.match.func);
+                expect(prependOnceListenerSpy.getCall(1)).to.have.been.calledWith('response', sinon.match.func);
+              });
+            })
 
-            it(`attaches listeners only once for each event ("finish", "response") ${name}.request()`, () => {
-              // WHEN
-              hinout.collect().collect();
-              moduleUnderTest.request(url);
-              // THEN
-              expect(prependOnceListenerSpy).to.have.been.calledTwice()
-              expect(prependOnceListenerSpy.getCall(0)).to.have.been.calledWith('finish', sinon.match.func);
-              expect(prependOnceListenerSpy.getCall(1)).to.have.been.calledWith('response', sinon.match.func);
+            context('.request()', () => {
+              it(`attaches listeners only once for each event ("finish", "response")`, () => {
+                // WHEN
+                hinout.collect().collect();
+                moduleUnderTest.request(url);
+                // THEN
+                expect(prependOnceListenerSpy).to.have.been.calledTwice()
+                expect(prependOnceListenerSpy.getCall(0)).to.have.been.calledWith('finish', sinon.match.func);
+                expect(prependOnceListenerSpy.getCall(1)).to.have.been.calledWith('response', sinon.match.func);
+              })
             })
           })
         })
