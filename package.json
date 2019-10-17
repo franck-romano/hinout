@@ -1,6 +1,6 @@
 {
   "name": "hinout",
-  "version": "1.1.5-beta",
+  "version": "1.1.7-beta",
   "description": "Log incoming and outgoind http request on your server",
   "main": "build/index.js",
   "types": "build/index.d.ts",

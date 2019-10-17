@@ -57,6 +57,7 @@ Returns an intance of `Hinout`
 This project is in its early stage, so feel free to contribute ! :)
 
 - [ ] Add elapsed time of request in logs
+- [X] Support for HTTPS requests
 - [ ] Disable logging and emit events only
 - [ ] Writing events to a file
 - [ ] Logging payload and response of an HTTP request
