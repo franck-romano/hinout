@@ -1,6 +1,6 @@
-import { expect } from './config';
-import formatter from '../src/formatter';
-import eventTypes from '../src/domain/events/event-types'
+import { expect } from '../config';
+import formatter from '../../src/infrastructure/formatter';
+import eventTypes from '../../src/domain/events/event-types'
 
 describe('Formatter', () => {
   describe('.(event)', () => {

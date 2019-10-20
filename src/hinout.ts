@@ -8,6 +8,7 @@ export default class Hinout extends EventEmitter {
   private logFn;
   private formatFn;
   private isCollecting;
+
   constructor(options: HinoutOptions) {
     super();
     this.logFn = options.logFn;

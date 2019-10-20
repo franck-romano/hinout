@@ -1,9 +1,9 @@
 import http from 'http';
 import https from 'https';
 import Hinout from '../src/hinout';
-import format from '../src/formatter'
 import { sinon, expect } from './config';
 import { httpServer, httpsServer } from './server';
+import format from '../src/infrastructure/formatter'
 
 describe('Hinout', () => {
   const path = '/foo';
