@@ -1,18 +1,6 @@
-import eventTypes from './event-types';
-
-interface OutEvent {
-  host: string;
-  method: string;
-  path: string;
-  eventType: string;
-}
-
-interface InEvent {
-  httpVersion: string;
-  statusCode: number;
-  statusMessage: string;
-  eventType: string;
-}
+import { InEvent } from './domain/events/in-event';
+import { OutEvent } from './domain/events/out-event';
+import eventTypes from './domain/events/event-types';
 
 export default function(event: OutEvent | InEvent) {
   if (event.eventType === eventTypes.OUT) {

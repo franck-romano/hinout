@@ -1,12 +1,8 @@
 import http from 'http';
 import https from 'https';
 import { EventEmitter } from 'events';
-import eventTypes from './event-types';
-
-interface HinoutOptions {
-  logFn: Function;
-  formatFn: Function;
-}
+import eventTypes from './domain/events/event-types';
+import { HinoutOptions } from './domain/hinout-options';
 
 export default class Hinout extends EventEmitter {
   private logFn;
