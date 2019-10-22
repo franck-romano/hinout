@@ -1,21 +1,18 @@
-import http from 'http';
-import https from 'https';
-import { EventEmitter } from 'events';
 import eventTypes from './domain/events/event-types';
 import { HinoutOptions } from './domain/hinout-options';
 
-export default class Hinout extends EventEmitter {
+export default class Hinout {
+  private eventHandler;
   private logFn;
   private formatFn;
-  private isCollecting;
+  private isCollecting = false;
 
   constructor(options: HinoutOptions) {
-    super();
     this.logFn = options.logFn;
-    this.isCollecting = false;
     this.formatFn = options.formatFn;
-    this.on(eventTypes.OUT, event => this.logFn(this.formatFn(event)));
-    this.on(eventTypes.IN, event => this.logFn(this.formatFn(event)));
+    this.eventHandler = options.eventHandler;
+
+    this.interceptEmittedEvents();
   }
 
   /**
@@ -24,18 +21,9 @@ export default class Hinout extends EventEmitter {
    */
   collect(): Hinout {
     if (!this.isCollecting) {
-      [
-        { module: http, fnName: 'get', fn: http.get },
-        { module: http, fnName: 'request', fn: http.request },
-        { module: https, fnName: 'get', fn: https.get },
-        { module: https, fnName: 'request', fn: https.request }
-      ].forEach(({ module, fnName, fn }) => {
-        const fnWithListeners = this.attachListenersToFn.bind(this, fn);
-        module[fnName] = fnWithListeners;
-      });
+      this.eventHandler.attachListeners();
+      this.isCollecting = true;
     }
-    this.isCollecting = true;
-
     return this;
   }
 
@@ -49,26 +37,8 @@ export default class Hinout extends EventEmitter {
     return this;
   }
 
-  private attachListenersToFn(fn: Function, ...args) {
-    const request = fn(...args);
-    this.emitOnOutbound(request);
-    this.emitOnInbound(request);
-
-    return request;
-  }
-
-  private emitOnOutbound(request): void {
-    const { method, path } = request;
-    const host = request.getHeader('host');
-    request.prependOnceListener('finish', () =>
-      this.emit(eventTypes.OUT, { host, method, path, eventType: eventTypes.OUT })
-    );
-  }
-
-  private emitOnInbound(request): void {
-    request.prependOnceListener('response', response => {
-      const { statusCode, statusMessage, httpVersion } = response;
-      this.emit(eventTypes.IN, { httpVersion, statusCode, statusMessage, eventType: eventTypes.IN });
-    });
+  private interceptEmittedEvents() {
+    this.eventHandler.on(eventTypes.OUT, event => this.logFn(this.formatFn(event)));
+    this.eventHandler.on(eventTypes.IN, event => this.logFn(this.formatFn(event)));
   }
 }
