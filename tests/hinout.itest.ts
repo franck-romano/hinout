@@ -12,7 +12,13 @@ describe('Hinout', () => {
   const host = 'localhost';
   const logFn = sinon.spy();
   new Hinout({ logFn, formatFn: format, eventHandler: new EventHandler() }).collect();
-  afterEach(() => logFn.resetHistory());
+
+  const processHrtimeStub = sinon.stub(process, 'hrtime');
+  beforeEach(() => processHrtimeStub.returns([0, 0]));
+  afterEach(() => {
+    logFn.resetHistory();
+    processHrtimeStub.reset();
+  });
 
   describe('.({ logFn , formatFn, eventHandler })', () => {
     [
@@ -42,13 +48,13 @@ describe('Hinout', () => {
 
         context('sucess', () => {
           context('.get(url)', () => {
-            it('logs inbound an outbound request', async () => {
+            it('logs inbound and outbound request', async () => {
               // WHEN
               await get(path, module);
               // THEN
               expect(logFn).to.have.been.calledTwice();
               expect(logFn.getCall(0)).to.have.been.calledWith(`OUT - GET ${host}:${port}${path}`);
-              expect(logFn.getCall(1)).to.have.been.calledWith('IN - HTTP 1.1 200 OK');
+              expect(logFn.getCall(1)).to.have.been.calledWith('IN - HTTP 1.1 200 OK - Elapsed time: 0s 0ms');
             });
           });
 
@@ -60,13 +66,15 @@ describe('Hinout', () => {
               { method: 'DELETE', statusCode: 200, statusMessage: 'OK' }
             ].forEach(({ method, statusCode, statusMessage }) => {
               context(`HTTP method: ${method}`, () => {
-                it('logs inbound an outbound request', async () => {
+                it('logs inbound and outbound request', async () => {
                   // WHEN
                   await request(method, path, module);
                   // THEN
                   expect(logFn).to.have.been.calledTwice();
                   expect(logFn.getCall(0)).to.have.been.calledWith(`OUT - ${method} ${host}:${port}${path}`);
-                  expect(logFn.getCall(1)).to.have.been.calledWith(`IN - HTTP 1.1 ${statusCode} ${statusMessage}`);
+                  expect(logFn.getCall(1)).to.have.been.calledWith(
+                    `IN - HTTP 1.1 ${statusCode} ${statusMessage} - Elapsed time: 0s 0ms`
+                  );
                 });
               });
             });
@@ -75,13 +83,13 @@ describe('Hinout', () => {
 
         context('error', () => {
           context('.get()', () => {
-            it('logs inbound an outbound request', async () => {
+            it('logs inbound and outbound request', async () => {
               // WHEN
               await get(errorPath, module);
               // THEN
               expect(logFn).to.have.been.calledTwice();
               expect(logFn.getCall(0)).to.have.been.calledWith(`OUT - GET ${host}:${port}${errorPath}`);
-              expect(logFn.getCall(1)).to.have.been.calledWith('IN - HTTP 1.1 400 Bad Request');
+              expect(logFn.getCall(1)).to.have.been.calledWith('IN - HTTP 1.1 400 Bad Request - Elapsed time: 0s 0ms');
             });
           });
 
@@ -93,13 +101,15 @@ describe('Hinout', () => {
               { method: 'DELETE', statusCode: 403, statusMessage: 'Forbidden' }
             ].forEach(({ method, statusCode, statusMessage }) => {
               context(`HTTP method: ${method}`, () => {
-                it('logs inbound an outbound request', async () => {
+                it('logs inbound and outbound request', async () => {
                   // WHEN
                   await request(method, errorPath, module);
                   // THEN
                   expect(logFn).to.have.been.calledTwice();
                   expect(logFn.getCall(0)).to.have.been.calledWith(`OUT - ${method} ${host}:${port}${errorPath}`);
-                  expect(logFn.getCall(1)).to.have.been.calledWith(`IN - HTTP 1.1 ${statusCode} ${statusMessage}`);
+                  expect(logFn.getCall(1)).to.have.been.calledWith(
+                    `IN - HTTP 1.1 ${statusCode} ${statusMessage} - Elapsed time: 0s 0ms`
+                  );
                 });
               });
             });

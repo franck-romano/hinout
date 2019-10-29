@@ -21,9 +21,10 @@ export default class EventHandler extends EventEmitter {
   }
 
   private attachListenersToFn(fn: Function, ...args) {
+    const startTime = process.hrtime();
     const request = fn(...args);
     this.emitOnOutbound(request);
-    this.emitOnInbound(request);
+    this.emitOnInbound(request, startTime);
 
     return request;
   }
@@ -36,10 +37,11 @@ export default class EventHandler extends EventEmitter {
     );
   }
 
-  private emitOnInbound(request): void {
+  private emitOnInbound(request, startTime: [number, number]): void {
     request.prependOnceListener('response', response => {
       const { statusCode, statusMessage, httpVersion } = response;
-      this.emit(eventTypes.IN, { httpVersion, statusCode, statusMessage, eventType: eventTypes.IN });
+      const elapsedTime = process.hrtime(startTime);
+      this.emit(eventTypes.IN, { httpVersion, statusCode, statusMessage, eventType: eventTypes.IN, elapsedTime });
     });
   }
 }

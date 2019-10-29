@@ -3,4 +3,5 @@ export interface InEvent {
   statusCode: number;
   statusMessage: string;
   eventType: string;
+  elapsedTime: [number, number];
 }

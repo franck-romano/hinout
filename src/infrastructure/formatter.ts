@@ -8,7 +8,9 @@ export default (event: OutEvent | InEvent) => {
     return `${eventType.toUpperCase()} - ${method} ${host}${path}`;
   }
   if (event.eventType === eventTypes.IN) {
-    const { httpVersion, statusCode, statusMessage, eventType } = event as InEvent;
-    return `${eventType.toUpperCase()} - HTTP ${httpVersion} ${statusCode} ${statusMessage}`;
+    const { httpVersion, statusCode, statusMessage, eventType, elapsedTime } = event as InEvent;
+    const elapsedTimeInSec = elapsedTime[0];
+    const elapsedTimeInMs = elapsedTime[1] / 1000000;
+    return `${eventType.toUpperCase()} - HTTP ${httpVersion} ${statusCode} ${statusMessage} - Elapsed time: ${elapsedTimeInSec}s ${elapsedTimeInMs}ms`;
   }
 };

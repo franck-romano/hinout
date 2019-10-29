@@ -1,8 +1,8 @@
 import { expect } from '../config';
 import formatter from '../../src/infrastructure/formatter';
-import eventTypes from '../../src/domain/events/event-types'
+import eventTypes from '../../src/domain/events/event-types';
 
-describe('Formatter', () => {
+describe.only('Formatter', () => {
   describe('.(event)', () => {
     context('outbound event', () => {
       it('properly formats event', () => {
@@ -26,7 +26,8 @@ describe('Formatter', () => {
           httpVersion: '1.1',
           statusCode: 200,
           statusMessage: 'OK',
-          eventType: eventTypes.IN
+          eventType: eventTypes.IN,
+          elapsedTime: [0, 1] as [number, number]
         };
         // WHEN
         const actual = formatter(inboundEvent);
