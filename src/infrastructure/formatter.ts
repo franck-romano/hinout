@@ -11,6 +11,7 @@ export default (event: OutEvent | InEvent) => {
     const { httpVersion, statusCode, statusMessage, eventType, elapsedTime } = event as InEvent;
     const elapsedTimeInSec = elapsedTime[0];
     const elapsedTimeInMs = elapsedTime[1] / 1000000;
+
     return `${eventType.toUpperCase()} - HTTP ${httpVersion} ${statusCode} ${statusMessage} - Elapsed time: ${elapsedTimeInSec}s ${elapsedTimeInMs}ms`;
   }
 };

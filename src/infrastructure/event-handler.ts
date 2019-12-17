@@ -8,7 +8,7 @@ export default class EventHandler extends EventEmitter {
     super();
   }
 
-  attachListeners() {
+  attachListeners(): void {
     [
       { module: http, fnName: 'get', fn: http.get },
       { module: http, fnName: 'request', fn: http.request },
@@ -20,7 +20,7 @@ export default class EventHandler extends EventEmitter {
     });
   }
 
-  private attachListenersToFn(fn: Function, ...args) {
+  private attachListenersToFn(fn: Function, ...args): Request {
     const startTime = process.hrtime();
     const request = fn(...args);
     this.emitOnOutbound(request);
@@ -32,9 +32,9 @@ export default class EventHandler extends EventEmitter {
   private emitOnOutbound(request): void {
     const { method, path } = request;
     const host = request.getHeader('host');
-    request.prependOnceListener('finish', () =>
-      this.emit(eventTypes.OUT, { host, method, path, eventType: eventTypes.OUT })
-    );
+    request.prependOnceListener('finish', () => {
+      this.emit(eventTypes.OUT, { host, method, path, eventType: eventTypes.OUT });
+    });
   }
 
   private emitOnInbound(request, startTime: [number, number]): void {
