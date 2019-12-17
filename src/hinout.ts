@@ -1,6 +1,5 @@
 import eventTypes from './domain/events/event-types';
 import { HinoutOptions } from './domain/hinout-options';
-import { OutEvent } from './domain/events/out-event';
 
 export default class Hinout {
   private logFn;
