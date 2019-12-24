@@ -46,7 +46,7 @@ describe('Hinout', () => {
           process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '1';
         });
 
-        context('sucess', () => {
+        context('succes', () => {
           context('.get(url)', () => {
             it('logs inbound and outbound request', async () => {
               // WHEN

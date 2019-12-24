@@ -26,7 +26,7 @@ Then start collecting using :
 Hinout.collect()
 ```
 
-Each http request will be logged using `console.log`  by default.
+Each http request will be logged using `console.log` by default.
 
 Here's an example of an `outbound` and `inbound` formatted log:
 	
