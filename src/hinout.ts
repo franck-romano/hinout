@@ -1,4 +1,6 @@
+import { InEvent } from './domain/events/in-event';
 import eventTypes from './domain/events/event-types';
+import { OutEvent } from './domain/events/out-event';
 import { HinoutOptions } from './domain/hinout-options';
 
 export default class Hinout {
@@ -37,7 +39,7 @@ export default class Hinout {
   }
 
   private interceptEmittedEvents(): void {
-    this.eventHandler.on(eventTypes.OUT, event => this.logFn(this.formatFn(event)));
-    this.eventHandler.on(eventTypes.IN, event => this.logFn(this.formatFn(event)));
+    this.eventHandler.on(eventTypes.OUT, (event: OutEvent) => this.logFn(this.formatFn(event)));
+    this.eventHandler.on(eventTypes.IN, (event: InEvent) => this.logFn(this.formatFn(event)));
   }
 }

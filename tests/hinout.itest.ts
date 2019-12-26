@@ -14,9 +14,14 @@ describe('Hinout', () => {
   new Hinout({ logFn, formatFn: format, eventHandler: new EventHandler() }).collect();
 
   const processHrtimeStub = sinon.stub(process, 'hrtime');
-  beforeEach(() => processHrtimeStub.returns([0, 0]));
+  const dateNowStub = sinon.stub(Date, 'now');
+  beforeEach(() => {
+    dateNowStub.returns(12345);
+    processHrtimeStub.returns([0, 0]);
+  });
   afterEach(() => {
     logFn.resetHistory();
+    dateNowStub.reset();
     processHrtimeStub.reset();
   });
 
@@ -53,8 +58,8 @@ describe('Hinout', () => {
               await get(path, module);
               // THEN
               expect(logFn).to.have.been.calledTwice();
-              expect(logFn.getCall(0)).to.have.been.calledWith(`OUT - GET ${host}:${port}${path}`);
-              expect(logFn.getCall(1)).to.have.been.calledWith('IN - HTTP 1.1 200 OK - Elapsed time: 0s 0ms');
+              expect(logFn.getCall(0)).to.have.been.calledWith(`[12345] OUT - GET ${host}:${port}${path}`);
+              expect(logFn.getCall(1)).to.have.been.calledWith('[12345] IN - HTTP 1.1 200 OK - Elapsed time: 0s 0ms');
             });
           });
 
@@ -71,9 +76,9 @@ describe('Hinout', () => {
                   await request(method, path, module);
                   // THEN
                   expect(logFn).to.have.been.calledTwice();
-                  expect(logFn.getCall(0)).to.have.been.calledWith(`OUT - ${method} ${host}:${port}${path}`);
+                  expect(logFn.getCall(0)).to.have.been.calledWith(`[12345] OUT - ${method} ${host}:${port}${path}`);
                   expect(logFn.getCall(1)).to.have.been.calledWith(
-                    `IN - HTTP 1.1 ${statusCode} ${statusMessage} - Elapsed time: 0s 0ms`
+                    `[12345] IN - HTTP 1.1 ${statusCode} ${statusMessage} - Elapsed time: 0s 0ms`
                   );
                 });
               });
@@ -88,8 +93,10 @@ describe('Hinout', () => {
               await get(errorPath, module);
               // THEN
               expect(logFn).to.have.been.calledTwice();
-              expect(logFn.getCall(0)).to.have.been.calledWith(`OUT - GET ${host}:${port}${errorPath}`);
-              expect(logFn.getCall(1)).to.have.been.calledWith('IN - HTTP 1.1 400 Bad Request - Elapsed time: 0s 0ms');
+              expect(logFn.getCall(0)).to.have.been.calledWith(`[12345] OUT - GET ${host}:${port}${errorPath}`);
+              expect(logFn.getCall(1)).to.have.been.calledWith(
+                '[12345] IN - HTTP 1.1 400 Bad Request - Elapsed time: 0s 0ms'
+              );
             });
           });
 
@@ -106,9 +113,11 @@ describe('Hinout', () => {
                   await request(method, errorPath, module);
                   // THEN
                   expect(logFn).to.have.been.calledTwice();
-                  expect(logFn.getCall(0)).to.have.been.calledWith(`OUT - ${method} ${host}:${port}${errorPath}`);
+                  expect(logFn.getCall(0)).to.have.been.calledWith(
+                    `[12345] OUT - ${method} ${host}:${port}${errorPath}`
+                  );
                   expect(logFn.getCall(1)).to.have.been.calledWith(
-                    `IN - HTTP 1.1 ${statusCode} ${statusMessage} - Elapsed time: 0s 0ms`
+                    `[12345] IN - HTTP 1.1 ${statusCode} ${statusMessage} - Elapsed time: 0s 0ms`
                   );
                 });
               });

@@ -2,6 +2,8 @@ import http from 'http';
 import https from 'https';
 import { EventEmitter } from 'events';
 import eventTypes from '../domain/events/event-types';
+import { OutEvent } from '../domain/events/out-event';
+import { InEvent } from '../domain/events/in-event';
 
 export default class EventHandler extends EventEmitter {
   constructor() {
@@ -33,7 +35,8 @@ export default class EventHandler extends EventEmitter {
     const { method, path } = request;
     const host = request.getHeader('host');
     request.prependOnceListener('finish', () => {
-      this.emit(eventTypes.OUT, { host, method, path, eventType: eventTypes.OUT });
+      const outboundEvent: OutEvent = { timestamp: Date.now(), host, method, path, eventType: eventTypes.OUT };
+      this.emit(eventTypes.OUT, outboundEvent);
     });
   }
 
@@ -41,7 +44,15 @@ export default class EventHandler extends EventEmitter {
     request.prependOnceListener('response', response => {
       const { statusCode, statusMessage, httpVersion } = response;
       const elapsedTime = process.hrtime(startTime);
-      this.emit(eventTypes.IN, { httpVersion, statusCode, statusMessage, eventType: eventTypes.IN, elapsedTime });
+      const inboundEvent: InEvent = {
+        timestamp: Date.now(),
+        httpVersion,
+        statusCode,
+        statusMessage,
+        eventType: eventTypes.IN,
+        elapsedTime
+      };
+      this.emit(eventTypes.IN, inboundEvent);
     });
   }
 }

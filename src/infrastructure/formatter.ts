@@ -4,14 +4,15 @@ import eventTypes from '../domain/events/event-types';
 
 export default (event: OutEvent | InEvent) => {
   if (event.eventType === eventTypes.OUT) {
-    const { host, method, path, eventType } = event as OutEvent;
-    return `${eventType.toUpperCase()} - ${method} ${host}${path}`;
+    const { timestamp, host, method, path, eventType } = event as OutEvent;
+    return `[${timestamp}] ${eventType.toUpperCase()} - ${method} ${host}${path}`;
   }
+
   if (event.eventType === eventTypes.IN) {
-    const { httpVersion, statusCode, statusMessage, eventType, elapsedTime } = event as InEvent;
+    const { timestamp, httpVersion, statusCode, statusMessage, eventType, elapsedTime } = event as InEvent;
     const elapsedTimeInSec = elapsedTime[0];
     const elapsedTimeInMs = elapsedTime[1] / 1000000;
 
-    return `${eventType.toUpperCase()} - HTTP ${httpVersion} ${statusCode} ${statusMessage} - Elapsed time: ${elapsedTimeInSec}s ${elapsedTimeInMs}ms`;
+    return `[${timestamp}] ${eventType.toUpperCase()} - HTTP ${httpVersion} ${statusCode} ${statusMessage} - Elapsed time: ${elapsedTimeInSec}s ${elapsedTimeInMs}ms`;
   }
 };

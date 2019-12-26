@@ -29,8 +29,8 @@ Each http request will be logged using `console.log` by default.
 
 Here's an example of an `outbound` and `inbound` formatted log:
 	
-	OUT - GET http://localhost:8080/path
-	IN - HTTP 1.1 200 OK - Elapsed Time 0s 200ms
+	[1577367889] OUT - GET http://localhost:8080/path
+	[1577367890] IN - HTTP 1.1 200 OK - Elapsed Time 0s 200ms
 
 
 ### API
@@ -48,16 +48,16 @@ Override default logging function (`console.log`)
 ```js
 Hinout.setLoggingFunction(yourLoggger.info)
 
-// yourLogger.info will now be used as logging function
+// yourLogger.info() will now be used as logging function
 ```
 Returns an intance of `Hinout`
 
 ### What is missing ?
 This project is in its early stage, so feel free to contribute ! :)
 
-- [ ] Add timestamp in logs
 - [ ] Blacklist some target host
 - [ ] Logging payload and response of an HTTP request
+- [X] Add timestamp in logs
 - [X] Add elapsed time of request in logs
 - [X] Support for HTTPS requests
 - [X] Support for Node.js version < 8.X.X
