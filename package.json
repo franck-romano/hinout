@@ -1,6 +1,6 @@
 {
   "name": "hinout",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Log outbound and inbound HTTP requests from your application",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -19,7 +19,7 @@
     "compile": "tsc -p .",
     "test": "mocha -r ts-node/register tests/*.ts",
     "test:watch": "mocha -r ts-node/register tests/*.ts --watch --watch-extensions ts",
-    "prepublish": "yarn compile"
+    "prepare": "yarn compile"
   },
   "keywords": [
     "logging",

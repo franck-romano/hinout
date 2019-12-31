@@ -11,18 +11,13 @@
     "esModuleInterop": true /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */,
     "experimentalDecorators": true /* Enables experimental support for ES7 decorators. */,
     "noImplicitUseStrict": true,
+    "allowSyntheticDefaultImports": true,
     "alwaysStrict": false,
     "inlineSourceMap": true,
     "noImplicitThis": false,
     "declaration": true
   },
-  "exclude": [
-    "node_modules",
-    "build",
-    "tests"
-  ],
-  "typeRoot": [
-    "node_modules/@types"
-  ],
+  "exclude": ["node_modules", "build", "tests"],
+  "typeRoot": ["node_modules/@types"],
   "compileOnSave": false
 }
