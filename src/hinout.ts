@@ -1,17 +1,16 @@
-import { InEvent } from './domain/events/in-event';
 import eventTypes from './domain/events/event-types';
-import { OutEvent } from './domain/events/out-event';
 import { HinoutOptions } from './domain/hinout-options';
+import EventHandler from './infrastructure/event-handler';
+import { InEvent, InboundEvent } from './domain/events/in-event';
+import { OutEvent, OutboundEvent } from './domain/events/out-event';
 
 export default class Hinout {
   private logFn;
-  private formatFn;
-  private eventHandler;
+  private eventHandler: EventHandler;
   private isCollecting = false;
 
   constructor(options: HinoutOptions) {
     this.logFn = options.logFn;
-    this.formatFn = options.formatFn;
     this.eventHandler = options.eventHandler;
     this.interceptEmittedEvents();
   }
@@ -39,7 +38,11 @@ export default class Hinout {
   }
 
   private interceptEmittedEvents(): void {
-    this.eventHandler.on(eventTypes.OUT, (event: OutEvent) => this.logFn(this.formatFn(event)));
-    this.eventHandler.on(eventTypes.IN, (event: InEvent) => this.logFn(this.formatFn(event)));
+    this.eventHandler.on(eventTypes.OUT, (outboundEvent: OutboundEvent) => {
+      this.logFn(new OutEvent(outboundEvent).format());
+    });
+    this.eventHandler.on(eventTypes.IN, (inboundEvent: InboundEvent) => {
+      this.logFn(new InEvent(inboundEvent).format());
+    });
   }
 }

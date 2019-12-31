@@ -1,9 +1,9 @@
-import http from 'http';
 import https from 'https';
 import { EventEmitter } from 'events';
 import eventTypes from '../domain/events/event-types';
-import { OutEvent } from '../domain/events/out-event';
-import { InEvent } from '../domain/events/in-event';
+import { InboundEvent } from '../domain/events/in-event';
+import { OutboundEvent } from '../domain/events/out-event';
+import http, { ClientRequest, ClientRequestArgs, IncomingMessage } from 'http';
 
 export default class EventHandler extends EventEmitter {
   constructor() {
@@ -22,37 +22,53 @@ export default class EventHandler extends EventEmitter {
     });
   }
 
-  private attachListenersToFn(fn: Function, ...args): Request {
+  private attachListenersToFn(fn: Function, ...args): ClientRequest {
     const startTime = process.hrtime();
-    const request = fn(...args);
+    const request: ClientRequest = fn(...args);
+
     this.emitOnOutbound(request);
     this.emitOnInbound(request, startTime);
 
     return request;
   }
 
-  private emitOnOutbound(request): void {
+  private emitOnOutbound(request: ClientRequest & ClientRequestArgs): void {
     const { method, path } = request;
-    const host = request.getHeader('host');
+    const host = request.getHeader('host') as string;
     request.prependOnceListener('finish', () => {
-      const outboundEvent: OutEvent = { timestamp: Date.now(), host, method, path, eventType: eventTypes.OUT };
+      const outboundEvent: OutboundEvent = {
+        timestamp: Date.now(),
+        host,
+        method: method as string,
+        path
+      };
+
       this.emit(eventTypes.OUT, outboundEvent);
     });
   }
 
-  private emitOnInbound(request, startTime: [number, number]): void {
-    request.prependOnceListener('response', response => {
-      const { statusCode, statusMessage, httpVersion } = response;
+  private emitOnInbound(request: ClientRequest, startTime: [number, number]): void {
+    request.prependOnceListener('response', (response: IncomingMessage) => {
       const elapsedTime = process.hrtime(startTime);
-      const inboundEvent: InEvent = {
-        timestamp: Date.now(),
-        httpVersion,
-        statusCode,
-        statusMessage,
-        eventType: eventTypes.IN,
-        elapsedTime
-      };
-      this.emit(eventTypes.IN, inboundEvent);
+
+      const data: string[] = [];
+      response.on('data', chunk => {
+        data.push(chunk.toString());
+      });
+
+      response.on('end', () => {
+        const { statusCode, statusMessage, httpVersion } = response;
+        const inboundEvent: InboundEvent = {
+          timestamp: Date.now(),
+          httpVersion,
+          statusCode: statusCode as number,
+          statusMessage: statusMessage as string,
+          elapsedTime,
+          data
+        };
+
+        this.emit(eventTypes.IN, inboundEvent);
+      });
     });
   }
 }

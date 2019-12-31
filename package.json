@@ -17,8 +17,8 @@
     "lint": "gts check",
     "lint:fix": "gts fix",
     "compile": "tsc -p .",
-    "test": "mocha -r ts-node/register tests/*.ts",
-    "test:watch": "mocha -r ts-node/register tests/*.ts --watch --watch-extensions ts",
+    "test": "mocha -r ts-node/register tests/*test.ts",
+    "test:watch": "mocha -r ts-node/register tests/*test.ts --watch --watch-extensions ts",
     "prepare": "yarn compile"
   },
   "keywords": [
