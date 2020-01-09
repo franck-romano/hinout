@@ -1,11 +1,20 @@
-import { InEvent } from './in-event';
-import { OutEvent } from './out-event';
-
-export interface SerializedEvent<E = Record<string, string | number>> {
-  type: InEvent | OutEvent;
-  data: E;
+export interface SerializedInboundEvent {
+  eventType: string;
+  timestamp: number;
+  httpVersion: string;
+  statusCode: number;
+  statusMessage: string;
+  elapsedTimeInMs: number;
+  data: null | string;
+}
+export interface SerializedOutboundEvent {
+  eventType: string;
+  timestamp: number;
+  host: string;
+  method: string;
+  path: string;
 }
 
 export abstract class Event {
-  protected abstract format(): string;
+  protected abstract format(): SerializedInboundEvent | SerializedOutboundEvent;
 }

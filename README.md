@@ -27,18 +27,37 @@ Hinout.collect()
 
 Each http request will be logged using `console.log` by default.
 
-Here's an example of an `outbound` and `inbound` formatted log:
-	
-	[1577367889] OUT - GET http://localhost:8080/path
-	[1577367890] IN - HTTP 1.1 200 OK - Elapsed Time 0s 200ms
+#### Emitted events
+`outbound` event:
+```js
+{
+	eventType: 'OUT',
+	timestamp: 1577367889,
+	host: 'https://foo.bar.com',
+	method: 'GET',
+	path: '/'
+}
+```
 
+`inbound` event:
+```js
+{
+	eventType: 'IN',
+	elapsedTimeInMs: 0,
+	httpVersion: '1.1',
+	statusCode: 200,
+	statusMessage: 'OK',
+	data: '{"foo":"bar"}',
+	timestamp: 1577367889
+}
+```
 
 ### API
 **collect()** 
 
 Listen and log every http requests using `console.log` as default logging function
 
-Returns an intance of `Hinout`
+Returns an instance of `Hinout`
 
 **setLoggingFunction(loggingFunction)**
 
@@ -50,13 +69,13 @@ Hinout.setLoggingFunction(yourLoggger.info)
 
 // yourLogger.info() will now be used as logging function
 ```
-Returns an intance of `Hinout`
+Returns an instance of `Hinout`
 
 ### What is missing ?
 This project is in its early stage, so feel free to contribute ! :)
 
 - [ ] Blacklist some target host
-- [ ] Logging payload and response of an HTTP request
+- [X] Logging payload and response of an HTTP request
 - [X] Add timestamp in logs
 - [X] Add elapsed time of request in logs
 - [X] Support for HTTPS requests
