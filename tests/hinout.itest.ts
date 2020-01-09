@@ -4,11 +4,11 @@ import Hinout from '../src/hinout';
 import { sinon, expect } from './config';
 import { httpServer, httpsServer } from './server';
 import EventHandler from '../src/infrastructure/event-handler';
+import { SerializedOutboundEvent, SerializedInboundEvent } from '../src/domain/events/event';
 
 describe('Hinout', () => {
   const path = '/foo';
   const errorPath = '/bar';
-  const host = 'localhost';
   const logFn = sinon.spy();
   new Hinout({ logFn, eventHandler: new EventHandler() }).collect();
 
@@ -50,14 +50,29 @@ describe('Hinout', () => {
         context('success', () => {
           context('.get(url)', () => {
             it('logs inbound and outbound request', async () => {
+              // GIVEN
+              const expectedOutboundEvent: SerializedOutboundEvent = {
+                eventType: 'OUT',
+                host: `localhost:${port}`,
+                method: `localhost:${port}`,
+                path: '/foo',
+                timestamp: 12345
+              };
+
+              const expectedInboundEvent: SerializedInboundEvent = {
+                data: '{"foo":"bar"}',
+                elapsedTimeInMs: 0,
+                eventType: 'IN',
+                httpVersion: '1.1',
+                statusCode: 200,
+                statusMessage: 'OK',
+                timestamp: 12345
+              };
               // WHEN
               await get(path, module);
               // THEN
-              // expect(logFn).to.have.been.calledTwice();
-              expect(logFn.getCall(0)).to.have.been.calledWith(`[12345] OUT - GET ${host}:${port}${path}`);
-              expect(logFn.getCall(1)).to.have.been.calledWith(
-                '[12345] IN - HTTP 1.1 200 OK - Elapsed time: 0s 0ms - Response: {"foo":"bar"}'
-              );
+              expect(logFn.getCall(0)).to.have.been.calledWith(expectedOutboundEvent);
+              expect(logFn.getCall(1)).to.have.been.calledWith(expectedInboundEvent);
             });
           });
 
@@ -70,14 +85,28 @@ describe('Hinout', () => {
             ].forEach(({ method, statusCode, statusMessage, response }) => {
               context(`HTTP method: ${method}`, () => {
                 it('logs inbound and outbound request', async () => {
+                  const expectedOutboundEvent: SerializedOutboundEvent = {
+                    eventType: 'OUT',
+                    host: `localhost:${port}`,
+                    method: `localhost:${port}`,
+                    path: '/foo',
+                    timestamp: 12345
+                  };
+
+                  const expectedInboundEvent: SerializedInboundEvent = {
+                    data: response,
+                    elapsedTimeInMs: 0,
+                    eventType: 'IN',
+                    httpVersion: '1.1',
+                    statusCode,
+                    statusMessage,
+                    timestamp: 12345
+                  };
                   // WHEN
                   await request(method, path, module);
                   // THEN
-                  // expect(logFn).to.have.been.calledTwice();
-                  expect(logFn.getCall(0)).to.have.been.calledWith(`[12345] OUT - ${method} ${host}:${port}${path}`);
-                  expect(logFn.getCall(1)).to.have.been.calledWith(
-                    `[12345] IN - HTTP 1.1 ${statusCode} ${statusMessage} - Elapsed time: 0s 0ms - Response: ${response}`
-                  );
+                  expect(logFn.getCall(0)).to.have.been.calledWith(expectedOutboundEvent);
+                  expect(logFn.getCall(1)).to.have.been.calledWith(expectedInboundEvent);
                 });
               });
             });
@@ -87,14 +116,30 @@ describe('Hinout', () => {
         context('error', () => {
           context('.get()', () => {
             it('logs inbound and outbound request', async () => {
+              // GIVEN
+              const expectedOutboundEvent: SerializedOutboundEvent = {
+                eventType: 'OUT',
+                host: `localhost:${port}`,
+                method: `localhost:${port}`,
+                path: errorPath,
+                timestamp: 12345
+              };
+
+              const expectedInboundEvent: SerializedInboundEvent = {
+                data: 'Bad Request',
+                elapsedTimeInMs: 0,
+                eventType: 'IN',
+                httpVersion: '1.1',
+                statusCode: 400,
+                statusMessage: 'Bad Request',
+                timestamp: 12345
+              };
               // WHEN
               await get(errorPath, module);
               // THEN
               expect(logFn).to.have.been.calledTwice();
-              expect(logFn.getCall(0)).to.have.been.calledWith(`[12345] OUT - GET ${host}:${port}${errorPath}`);
-              expect(logFn.getCall(1)).to.have.been.calledWith(
-                '[12345] IN - HTTP 1.1 400 Bad Request - Elapsed time: 0s 0ms - Response: Bad Request'
-              );
+              expect(logFn.getCall(0)).to.have.been.calledWith(expectedOutboundEvent);
+              expect(logFn.getCall(1)).to.have.been.calledWith(expectedInboundEvent);
             });
           });
 
@@ -107,16 +152,30 @@ describe('Hinout', () => {
             ].forEach(({ method, statusCode, statusMessage, response }) => {
               context(`HTTP method: ${method}`, () => {
                 it('logs inbound and outbound request', async () => {
+                  // GIVEN
+                  const expectedOutboundEvent: SerializedOutboundEvent = {
+                    eventType: 'OUT',
+                    host: `localhost:${port}`,
+                    method: `localhost:${port}`,
+                    path: errorPath,
+                    timestamp: 12345
+                  };
+
+                  const expectedInboundEvent: SerializedInboundEvent = {
+                    data: response,
+                    elapsedTimeInMs: 0,
+                    eventType: 'IN',
+                    httpVersion: '1.1',
+                    statusCode,
+                    statusMessage: response,
+                    timestamp: 12345
+                  };
                   // WHEN
                   await request(method, errorPath, module);
                   // THEN
                   expect(logFn).to.have.been.calledTwice();
-                  expect(logFn.getCall(0)).to.have.been.calledWith(
-                    `[12345] OUT - ${method} ${host}:${port}${errorPath}`
-                  );
-                  expect(logFn.getCall(1)).to.have.been.calledWith(
-                    `[12345] IN - HTTP 1.1 ${statusCode} ${statusMessage} - Elapsed time: 0s 0ms - Response: ${response}`
-                  );
+                  expect(logFn.getCall(0)).to.have.been.calledWith(expectedOutboundEvent);
+                  expect(logFn.getCall(1)).to.have.been.calledWith(expectedInboundEvent);
                 });
               });
             });

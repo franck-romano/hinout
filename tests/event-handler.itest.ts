@@ -5,23 +5,23 @@ import { EventEmitter } from 'events';
 import { sinon, expect } from './config';
 import EventHandler from '../src/infrastructure/event-handler';
 
-describe.skip('Event Handler', () => {
+describe('Event Handler', () => {
   describe('.attachListeners()', () => {
-    let hinoutHttpNock, hinoutHttpsNock, prependOnceListenerSpy, emitSpy;
+    let hinoutHttpNock, hinoutHttpsNock, prependOnceListenerStub, emitStub;
     const eventHandler = new EventHandler();
     beforeEach(() => {
       hinoutHttpNock = nock(httpUrl);
       hinoutHttpsNock = nock(httpsUrl);
       hinoutHttpNock.get('/').reply(200);
       hinoutHttpsNock.get('/').reply(200);
-      emitSpy = sinon.spy(EventEmitter.prototype, 'emit');
-      prependOnceListenerSpy = sinon.spy(EventEmitter.prototype, 'prependOnceListener');
+      emitStub = sinon.stub(EventEmitter.prototype, 'emit');
+      prependOnceListenerStub = sinon.stub(EventEmitter.prototype, 'prependOnceListener');
     });
 
     afterEach(() => {
-      emitSpy.restore();
-      prependOnceListenerSpy.restore();
       nock.cleanAll();
+      emitStub.restore();
+      prependOnceListenerStub.restore();
     });
 
     const httpUrl = 'http://some-url.com';
@@ -39,9 +39,9 @@ describe.skip('Event Handler', () => {
               // WHEN
               moduleUnderTest.get(url);
               // THEN
-              prependOnceListenerSpy.withArgs('finish').yield();
-              expect(prependOnceListenerSpy).to.have.been.calledWith('finish');
-              expect(emitSpy).to.have.been.called();
+              prependOnceListenerStub.withArgs('finish').yield();
+              expect(prependOnceListenerStub).to.have.been.calledWith('finish');
+              expect(emitStub).to.have.been.called();
             });
           });
 
@@ -52,8 +52,8 @@ describe.skip('Event Handler', () => {
               // WHEN
               moduleUnderTest.get(url);
               // THEN
-              expect(prependOnceListenerSpy).to.have.been.calledWith('response');
-              expect(emitSpy).to.have.been.called();
+              expect(prependOnceListenerStub).to.have.been.calledWith('response');
+              expect(emitStub).to.have.been.called();
             });
           });
         });
@@ -66,9 +66,9 @@ describe.skip('Event Handler', () => {
               // WHEN
               moduleUnderTest.request(url);
               // THEN
-              prependOnceListenerSpy.withArgs('finish').yield();
-              expect(prependOnceListenerSpy).to.have.been.calledWith('finish');
-              expect(emitSpy).to.have.been.called();
+              prependOnceListenerStub.withArgs('finish').yield();
+              expect(prependOnceListenerStub).to.have.been.calledWith('finish');
+              expect(emitStub).to.have.been.called();
             });
           });
 
@@ -79,8 +79,8 @@ describe.skip('Event Handler', () => {
               // WHEN
               moduleUnderTest.request(url);
               // THEN
-              expect(prependOnceListenerSpy).to.have.been.calledWith('response');
-              expect(emitSpy).to.have.been.called();
+              expect(prependOnceListenerStub).to.have.been.calledWith('response');
+              expect(emitStub).to.have.been.called();
             });
           });
         });

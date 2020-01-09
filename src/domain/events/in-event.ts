@@ -1,5 +1,4 @@
-import { Event } from './event';
-
+import { Event, SerializedInboundEvent } from './event';
 export interface InboundEvent {
   timestamp: number;
   httpVersion: string;
@@ -15,9 +14,29 @@ export class InEvent extends Event {
     super();
   }
 
-  format(): string {
-    const elapsedTimeInSec = this.event.elapsedTime[0];
-    const elapsedTimeInMs = this.event.elapsedTime[1] / 1000000;
-    return `[${this.event.timestamp}] ${this.eventType} - HTTP ${this.event.httpVersion} ${this.event.statusCode} ${this.event.statusMessage} - Elapsed time: ${elapsedTimeInSec}s ${elapsedTimeInMs}ms - Response: ${this.event.data}`;
+  format(): SerializedInboundEvent {
+    return {
+      eventType: this.eventType,
+      httpVersion: this.event.httpVersion,
+      statusCode: this.event.statusCode,
+      statusMessage: this.event.statusMessage,
+      timestamp: this.event.timestamp,
+      data: this.formatData(),
+      elapsedTimeInMs: this.computeElapsedTimeInMs(this.event.elapsedTime)
+    };
+  }
+
+  private formatData(): string | null {
+    if (!this.event.data) {
+      return null;
+    }
+    return this.event.data[0];
+  }
+
+  private computeElapsedTimeInMs(elapsedTime: [number, number]): number {
+    const elapsedTimeInNs = elapsedTime[0] * 1000000000 + elapsedTime[1];
+    const elapsedTimeInMs = elapsedTimeInNs / 1000000;
+
+    return elapsedTimeInMs;
   }
 }

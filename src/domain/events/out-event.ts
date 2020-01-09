@@ -1,4 +1,4 @@
-import { Event } from './event';
+import { Event, SerializedOutboundEvent } from './event';
 export interface OutboundEvent {
   timestamp: number;
   host: string;
@@ -12,7 +12,13 @@ export class OutEvent extends Event {
     super();
   }
 
-  format(): string {
-    return `[${this.event.timestamp}] ${this.eventType} - ${this.event.method} ${this.event.host}${this.event.path}`;
+  format(): SerializedOutboundEvent {
+    return {
+      eventType: this.eventType,
+      host: this.event.host,
+      method: this.event.host,
+      path: this.event.path,
+      timestamp: this.event.timestamp
+    };
   }
 }
