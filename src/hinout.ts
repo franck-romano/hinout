@@ -16,7 +16,7 @@ export default class Hinout {
   }
 
   /**
-   *  Starts collecting and writing HTTP(s) requests logs to sdout
+   * Starts collecting and writing HTTP(s) requests logs to sdout
    * @returns {Hinout} Instanciated Hinout object
    */
   collect(): Hinout {
