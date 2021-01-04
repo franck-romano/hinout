@@ -1,10 +1,10 @@
 import http from 'http';
 import https from 'https';
+import { SerializedInboundEvent, SerializedOutboundEvent } from '../src/domain/events/event';
 import Hinout from '../src/hinout';
-import { sinon, expect } from './config';
-import { httpServer, httpsServer } from './server';
 import EventHandler from '../src/infrastructure/event-handler';
-import { SerializedOutboundEvent, SerializedInboundEvent } from '../src/domain/events/event';
+import { expect, sinon } from './config';
+import { httpServer, httpsServer } from './server';
 
 describe('Hinout', () => {
   const path = '/foo';
@@ -149,7 +149,7 @@ describe('Hinout', () => {
               { method: 'POST', statusCode: 401, statusMessage: 'Unauthorized', response: 'Unauthorized' },
               { method: 'PUT', statusCode: 404, statusMessage: 'Not Found', response: 'Not Found' },
               { method: 'DELETE', statusCode: 403, statusMessage: 'Forbidden', response: 'Forbidden' }
-            ].forEach(({ method, statusCode, statusMessage, response }) => {
+            ].forEach(({ method, statusCode, response }) => {
               context(`HTTP method: ${method}`, () => {
                 it('logs inbound and outbound request', async () => {
                   // GIVEN
@@ -191,11 +191,11 @@ function get(path: string, module: typeof http | typeof https) {
   const host = isHttps ? 'https://localhost:8443' : 'http://localhost:8081';
   return new Promise((resolve, reject) => {
     const data: string[] = [];
-    module['get'](`${host}${path}`, result => {
-      result.on('data', chunk => {
+    module['get'](`${host}${path}`, (result) => {
+      result.on('data', (chunk) => {
         data.push(chunk.toString());
       });
-      result.on('end', () => resolve(...data));
+      result.on('end', () => resolve(...(data as [any])));
       result.on('error', reject);
     }).end();
   });
@@ -206,11 +206,11 @@ function request(method: string, path: string, module: typeof http | typeof http
   const port = isHttps ? 8443 : 8081;
   return new Promise((resolve, reject) => {
     const data: string[] = [];
-    module['request']({ host: 'localhost', port, path, method }, result => {
-      result.on('data', chunk => {
+    module['request']({ host: 'localhost', port, path, method }, (result) => {
+      result.on('data', (chunk) => {
         data.push(chunk.toString());
       });
-      result.on('end', () => resolve(...data));
+      result.on('end', () => resolve(...(data as [any])));
       result.on('error', reject);
     }).end();
   });

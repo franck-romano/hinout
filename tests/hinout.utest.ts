@@ -37,7 +37,7 @@ describe('Hinout', () => {
       let onSpy;
       beforeEach(() => (onSpy = sinon.spy(EventHandler.prototype, 'on')));
       afterEach(() => onSpy.restore());
-      
+
       context('outbound events', () => {
         it('logs the formatted event', () => {
           // GIVEN

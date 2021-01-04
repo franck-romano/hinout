@@ -52,7 +52,7 @@ export default class EventHandler extends EventEmitter {
       const elapsedTime = process.hrtime(startTime);
 
       const data: string[] = [];
-      response.on('data', chunk => {
+      response.on('data', (chunk) => {
         data.push(chunk.toString());
       });
 

@@ -1,0 +1,14 @@
+{
+  "extends": "./node_modules/gts/",
+  "rules": {
+    "node/no-unpublished-import": 0,
+    "no-unpublished-require": 0,
+    "no-missing-require": 0,
+    "no-default-export": 0,
+    "no-process-exit": 0,
+    "node/no-extraneous-import": 0,
+    "@typescript-eslint/ban-ts-comment": 0,
+    "no-restricted-properties": 0,
+    "@typescript-eslint/no-explicit-any": 0
+  }
+}
