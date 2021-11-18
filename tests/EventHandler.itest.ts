@@ -3,7 +3,7 @@ import http from 'http';
 import https from 'https';
 import { EventEmitter } from 'events';
 import { sinon, expect } from './config';
-import EventHandler from '../src/infrastructure/event-handler';
+import { EventHandler } from '../src/infrastructure/EventHandler';
 
 describe('Event Handler', () => {
   describe('.attachListeners()', () => {

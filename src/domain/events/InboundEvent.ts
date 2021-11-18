@@ -1,5 +1,7 @@
-import { Event, SerializedInboundEvent } from './event';
-export interface InboundEvent {
+import { Event, SerializedInboundEvent } from './Event';
+import { EVENT_TYPES } from './EventTypes';
+
+export interface InboundEventAttributes {
   timestamp: number;
   httpVersion: string;
   statusCode: number;
@@ -8,16 +10,15 @@ export interface InboundEvent {
   data?: string[];
 }
 
-export class InEvent extends Event {
-  protected readonly eventType = 'IN';
-  constructor(private event: InboundEvent) {
+export class InboundEvent extends Event {
+  constructor(private event: InboundEventAttributes) {
     super();
   }
 
   format(): SerializedInboundEvent {
     return {
-      eventType: this.eventType,
-      elapsedTimeInMs: this.computeElapsedTimeInMs(this.event.elapsedTime),
+      eventType: EVENT_TYPES.INBOUND,
+      elapsedTimeInMs: InboundEvent.computeElapsedTimeInMs(this.event.elapsedTime),
       httpVersion: this.event.httpVersion,
       statusCode: this.event.statusCode,
       statusMessage: this.event.statusMessage,
@@ -33,10 +34,8 @@ export class InEvent extends Event {
     return this.event.data[0];
   }
 
-  private computeElapsedTimeInMs(elapsedTime: [number, number]): number {
+  private static computeElapsedTimeInMs(elapsedTime: [number, number]): number {
     const elapsedTimeInNs = elapsedTime[0] * 1000000000 + elapsedTime[1];
-    const elapsedTimeInMs = elapsedTimeInNs / 1000000;
-
-    return elapsedTimeInMs;
+    return elapsedTimeInNs / 1000000;
   }
 }

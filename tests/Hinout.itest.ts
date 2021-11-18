@@ -1,10 +1,11 @@
 import http from 'http';
 import https from 'https';
-import { SerializedInboundEvent, SerializedOutboundEvent } from '../src/domain/events/event';
-import Hinout from '../src/hinout';
-import EventHandler from '../src/infrastructure/event-handler';
+import { SerializedInboundEvent, SerializedOutboundEvent } from '../src/domain/events/Event';
+import Hinout from '../src/Hinout';
 import { expect, sinon } from './config';
 import { httpServer, httpsServer } from './server';
+import { EventHandler } from '../src/infrastructure/EventHandler';
+import { EVENT_TYPES } from '../src/domain/events/EventTypes';
 
 describe('Hinout', () => {
   const path = '/foo';
@@ -52,7 +53,7 @@ describe('Hinout', () => {
             it('logs inbound and outbound request', async () => {
               // GIVEN
               const expectedOutboundEvent: SerializedOutboundEvent = {
-                eventType: 'OUT',
+                eventType: EVENT_TYPES.OUTBOUND,
                 host: `localhost:${port}`,
                 method: `localhost:${port}`,
                 path: '/foo',
@@ -62,7 +63,7 @@ describe('Hinout', () => {
               const expectedInboundEvent: SerializedInboundEvent = {
                 data: '{"foo":"bar"}',
                 elapsedTimeInMs: 0,
-                eventType: 'IN',
+                eventType: EVENT_TYPES.INBOUND,
                 httpVersion: '1.1',
                 statusCode: 200,
                 statusMessage: 'OK',
@@ -86,7 +87,7 @@ describe('Hinout', () => {
               context(`HTTP method: ${method}`, () => {
                 it('logs inbound and outbound request', async () => {
                   const expectedOutboundEvent: SerializedOutboundEvent = {
-                    eventType: 'OUT',
+                    eventType: EVENT_TYPES.OUTBOUND,
                     host: `localhost:${port}`,
                     method: `localhost:${port}`,
                     path: '/foo',
@@ -96,7 +97,7 @@ describe('Hinout', () => {
                   const expectedInboundEvent: SerializedInboundEvent = {
                     data: response,
                     elapsedTimeInMs: 0,
-                    eventType: 'IN',
+                    eventType: EVENT_TYPES.INBOUND,
                     httpVersion: '1.1',
                     statusCode,
                     statusMessage,
@@ -118,7 +119,7 @@ describe('Hinout', () => {
             it('logs inbound and outbound request', async () => {
               // GIVEN
               const expectedOutboundEvent: SerializedOutboundEvent = {
-                eventType: 'OUT',
+                eventType: EVENT_TYPES.OUTBOUND,
                 host: `localhost:${port}`,
                 method: `localhost:${port}`,
                 path: errorPath,
@@ -128,7 +129,7 @@ describe('Hinout', () => {
               const expectedInboundEvent: SerializedInboundEvent = {
                 data: 'Bad Request',
                 elapsedTimeInMs: 0,
-                eventType: 'IN',
+                eventType: EVENT_TYPES.INBOUND,
                 httpVersion: '1.1',
                 statusCode: 400,
                 statusMessage: 'Bad Request',
@@ -154,7 +155,7 @@ describe('Hinout', () => {
                 it('logs inbound and outbound request', async () => {
                   // GIVEN
                   const expectedOutboundEvent: SerializedOutboundEvent = {
-                    eventType: 'OUT',
+                    eventType: EVENT_TYPES.OUTBOUND,
                     host: `localhost:${port}`,
                     method: `localhost:${port}`,
                     path: errorPath,
@@ -164,7 +165,7 @@ describe('Hinout', () => {
                   const expectedInboundEvent: SerializedInboundEvent = {
                     data: response,
                     elapsedTimeInMs: 0,
-                    eventType: 'IN',
+                    eventType: EVENT_TYPES.INBOUND,
                     httpVersion: '1.1',
                     statusCode,
                     statusMessage: response,

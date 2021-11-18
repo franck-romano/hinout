@@ -1,12 +1,14 @@
-import Hinout from '../src/hinout';
-import { sinon, expect } from './config';
-import { InEvent } from '../src/domain/events/in-event';
-import { OutEvent } from '../src/domain/events/out-event';
-import EventHandler from '../src/infrastructure/event-handler';
-import { SerializedOutboundEvent, SerializedInboundEvent } from '../src/domain/events/event';
+import Hinout from '../src/Hinout';
+import { expect, sinon } from './config';
+import { InboundEvent } from '../src/domain/events/InboundEvent';
+import { OutboundEvent } from '../src/domain/events/OutboundEvent';
+import { SerializedInboundEvent, SerializedOutboundEvent } from '../src/domain/events/Event';
+import { EventHandler } from '../src/infrastructure/EventHandler';
+import { EVENT_TYPES } from '../src/domain/events/EventTypes';
 
 describe('Hinout', () => {
   const eventHandler = new EventHandler();
+
   describe('.({ logFn, eventHandler })', () => {
     describe('.collect()', () => {
       beforeEach(() => sinon.stub(eventHandler, 'attachListeners'));
@@ -42,7 +44,7 @@ describe('Hinout', () => {
         it('logs the formatted event', () => {
           // GIVEN
           const event: SerializedOutboundEvent = {
-            eventType: 'OUT',
+            eventType: EVENT_TYPES.OUTBOUND,
             timestamp: 12345,
             host: 'https://foo.bar.com',
             method: 'GET',
@@ -50,26 +52,28 @@ describe('Hinout', () => {
           };
           const logFnSpy = sinon.spy();
           const onCallbackSpy = sinon.spy();
-          sinon.stub(OutEvent.prototype, 'format').returns(event);
+          sinon.stub(OutboundEvent.prototype, 'format').returns(event);
           // WHEN
           new Hinout({
             logFn: logFnSpy,
             eventHandler
           }).collect();
 
-          eventHandler.on('out', onCallbackSpy).emit('out', event);
+          eventHandler.on(EVENT_TYPES.OUTBOUND, onCallbackSpy).emit(EVENT_TYPES.OUTBOUND, event);
           // THEN
+
           expect(onSpy).to.have.been.called();
-          expect(OutEvent.prototype.format).to.have.been.called();
+          expect(OutboundEvent.prototype.format).to.have.been.called();
           expect(onCallbackSpy).to.have.been.calledWith(event);
           expect(logFnSpy).to.have.been.calledWith(event);
         });
       });
+
       context('inbound events', () => {
         it('logs the formatted event', () => {
           // GIVEN
           const event: SerializedInboundEvent = {
-            eventType: 'IN',
+            eventType: EVENT_TYPES.INBOUND,
             timestamp: 12345,
             httpVersion: '1.1',
             statusCode: 200,
@@ -79,17 +83,19 @@ describe('Hinout', () => {
           };
           const logFnSpy = sinon.spy();
           const onCallbackSpy = sinon.spy();
-          sinon.stub(InEvent.prototype, 'format').returns(event);
+          sinon.stub(InboundEvent.prototype, 'format').returns(event);
+
           // WHEN
           new Hinout({
             logFn: logFnSpy,
             eventHandler
           }).collect();
 
-          eventHandler.on('in', onCallbackSpy).emit('in', event);
+          eventHandler.on(EVENT_TYPES.INBOUND, onCallbackSpy).emit(EVENT_TYPES.INBOUND, event);
+
           // THEN
           expect(onSpy).to.have.been.called();
-          expect(InEvent.prototype.format).to.have.been.called();
+          expect(InboundEvent.prototype.format).to.have.been.called();
           expect(onCallbackSpy).to.have.been.calledWith(event);
           expect(logFnSpy).to.have.been.calledWith(event);
         });
@@ -109,7 +115,7 @@ describe('Hinout', () => {
           .setLoggingFunction(newLoggerFn)
           .collect();
 
-        eventHandler.emit('out', 'some-event');
+        eventHandler.emit(EVENT_TYPES.OUTBOUND, 'some-event');
         // THEN
         expect(defaultLogFn).to.not.have.been.called();
         expect(newLoggerFn).to.have.been.called();

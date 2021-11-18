@@ -1,11 +1,11 @@
 import https from 'https';
 import { EventEmitter } from 'events';
-import eventTypes from '../domain/events/event-types';
-import { InboundEvent } from '../domain/events/in-event';
-import { OutboundEvent } from '../domain/events/out-event';
+import { EVENT_TYPES } from '../domain/events/EventTypes';
+import { InboundEventAttributes } from '../domain/events/InboundEvent';
+import { OutboundEventAttributes } from '../domain/events/OutboundEvent';
 import http, { ClientRequest, ClientRequestArgs, IncomingMessage } from 'http';
 
-export default class EventHandler extends EventEmitter {
+export class EventHandler extends EventEmitter {
   constructor() {
     super();
   }
@@ -36,14 +36,14 @@ export default class EventHandler extends EventEmitter {
     const { method, path } = request;
     const host = request.getHeader('host') as string;
     request.prependOnceListener('finish', () => {
-      const outboundEvent: OutboundEvent = {
+      const outboundEvent: OutboundEventAttributes = {
         timestamp: Date.now(),
         host,
         method: method as string,
         path
       };
 
-      this.emit(eventTypes.OUT, outboundEvent);
+      this.emit(EVENT_TYPES.OUTBOUND, outboundEvent);
     });
   }
 
@@ -58,7 +58,7 @@ export default class EventHandler extends EventEmitter {
 
       response.on('end', () => {
         const { statusCode, statusMessage, httpVersion } = response;
-        const inboundEvent: InboundEvent = {
+        const inboundEvent: InboundEventAttributes = {
           timestamp: Date.now(),
           httpVersion,
           statusCode: statusCode as number,
@@ -67,7 +67,7 @@ export default class EventHandler extends EventEmitter {
           data
         };
 
-        this.emit(eventTypes.IN, inboundEvent);
+        this.emit(EVENT_TYPES.INBOUND, inboundEvent);
       });
     });
   }

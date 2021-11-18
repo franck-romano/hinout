@@ -1,4 +1,4 @@
-import EventHandler from '../infrastructure/event-handler';
+import { EventHandler } from '../infrastructure/EventHandler';
 
 export interface HinoutOptions {
   logFn(formattedEvent: string): void;
