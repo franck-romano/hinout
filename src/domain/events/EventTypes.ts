@@ -1,4 +1,4 @@
 export enum EVENT_TYPES {
-  OUTBOUND = 'out',
-  INBOUND = 'in'
+  OUTBOUND = 'OUTBOUND',
+  INBOUND = 'INBOUND'
 }
