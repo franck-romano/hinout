@@ -31,24 +31,24 @@ Each http request will be logged using `console.log` by default.
 `outbound` event:
 ```js
 {
-	eventType: 'OUT',
-	timestamp: 1577367889,
-	host: 'https://foo.bar.com',
-	method: 'GET',
-	path: '/'
+  eventType: 'OUTBOUND', 
+  timestamp: 1577367889,
+  host: 'https://foo.bar.com',
+  method: 'GET',
+  path: '/'
 }
 ```
 
 `inbound` event:
 ```js
 {
-	eventType: 'IN',
-	elapsedTimeInMs: 0,
-	httpVersion: '1.1',
-	statusCode: 200,
-	statusMessage: 'OK',
-	data: '{"foo":"bar"}',
-	timestamp: 1577367889
+  eventType: 'INBOUND',
+  elapsedTimeInMs: 0,
+  httpVersion: '1.1',
+  statusCode: 200,
+  statusMessage: 'OK',
+  data: '{"foo":"bar"}',
+  timestamp: 1577367889
 }
 ```
 
